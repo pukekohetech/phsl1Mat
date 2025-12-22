@@ -1,0 +1,65 @@
+{
+  "APP_TITLE": "US 24355 – Materials Knowledge",
+  "APP_SUBTITLE": "Pukekohe High School – All 5 Parts",
+  "TEACHERS": [
+    { "id": "RY", "name": "Mr Reynolds", "email": "ry@pukekohehigh.school.nz" },
+    { "id": "RNR", "name": "Mr Ranford", "email": "rnr@pukekohehigh.school.nz" },
+    { "id": "Other", "name": "Other Teacher", "email": "technology@pukekohehigh.school.nz" }
+  ],
+  "ASSESSMENTS": [
+    {
+      "id": "24355-part1",
+      "title": "US 24355 Materials – Part 1",
+      "subtitle": "New Zealand Timbers (11 marks)",
+      "totalPoints": 11,
+      "questions": [
+        { "id": "q1", "text": "What is the most common exotic timber that is grown in plantations in New Zealand?", "type": "short", "maxPoints": 2, "hint": "Fast-growing softwood, name includes 'pine', planted everywhere since the 1930s – check Radiata pine on page 13 of the booklet.", "rubric": [ { "points": 2, "check": "\\\\b(radiata\\\\s+pine|pinus\\\\s+radiata)\\\\b" } ] },
+        { "id": "q2", "text": "Name 2 types of New Zealand native timbers that can be used for high-quality furniture.", "type": "short", "maxPoints": 2, "hint": "One starts with R (warm golden colour) on page 12, one with K (light brown, also used for furniture) on page 13.", "rubric": [ { "points": 1, "check": "\\\\brimu\\\\b" }, { "points": 1, "check": "\\\\bkauri\\\\b" } ] },
+        { "id": "q3", "text": "Name an imported timber that can be used for decking and outdoor furniture.", "type": "short", "maxPoints": 2, "hint": "Dense, reddish-brown Southeast Asian hardwood – see the dot points about imported timbers on page 14.", "rubric": [ { "points": 2, "check": "\\\\b(kwila|merbau)\\\\b" } ] },
+        { "id": "q4", "text": "List 3 types of timber that are commonly used for woodturning.", "type": "short", "maxPoints": 3, "hint": "Have another look at the native and swamp timbers (especially swamp kauri) described on pages 12–13.", "rubric": [ { "points": 1, "check": "\\\\bkauri\\\\b" }, { "points": 1, "check": "\\\\bmatai\\\\b" }, { "points": 1, "check": "\\\\b(rewarewa|rimu|puriri|totara)\\\\b" } ] }
+      ]
+    },
+    {
+      "id": "24355-part2",
+      "title": "US 24355 Materials – Part 2",
+      "subtitle": "Manufactured Boards & Plastics (9 marks)",
+      "totalPoints": 9,
+      "questions": [
+        { "id": "q5", "text": "Describe the effects of moisture on MDF.", "type": "long", "maxPoints": 3, "hint": "Look at the disadvantages of MDF in the Manufactured Boards section on page 18 – what happens when it gets wet?", "rubric": [ { "points": 1, "check": "\\\\b(swell|expand)" }, { "points": 1, "check": "fibre|fiber|break|degrade" }, { "points": 1, "check": "weak|lose.*strength" } ] },
+        { "id": "q6", "text": "Name a lightweight expanded plastic used for insulation and buoyancy.", "type": "short", "maxPoints": 2, "hint": "Check the Plastics (Thermoplastics) section on page 22 – white beady foam sheets used for packaging and insulation.", "rubric": [ { "points": 2, "check": "\\\\b(polystyrene|eps|styrofoam)\\\\b" } ] },
+        { "id": "q7", "text": "Name a hard, transparent plastic that can be bulletproof and noise-resistant.", "type": "short", "maxPoints": 2, "hint": "This one goes beyond the booklet (which talks about glass on page 24) – think of the clear plastic used for riot shields and bus shelters.", "rubric": [ { "points": 2, "check": "\\\\b(polycarbonate|lexan|makrolon)\\\\b" } ] },
+        { "id": "q8", "text": "Name the plastic sheet used as a waterproof membrane under concrete slabs.", "type": "short", "maxPoints": 2, "hint": "See the note about polythene being used as a damp-proof membrane (DPM) in the Plastics section on page 22.", "rubric": [ { "points": 2, "check": "\\\\b(polythene|polyethylene|dpm|damp.?proof)\\\\b" } ] }
+      ]
+    },
+    {
+      "id": "24355-part3",
+      "title": "US 24355 Materials – Part 3",
+      "subtitle": "Metals & Concrete (5 marks)",
+      "totalPoints": 5,
+      "questions": [
+        { "id": "q9", "text": "Name a commonly used metal that can be easily joined by welding.", "type": "short", "maxPoints": 2, "hint": "Check the first bullet list under Mild steel on page 20 – it says it is easily worked and welded.", "rubric": [ { "points": 2, "check": "\\\\b(mild\\\\s+steel|low\\\\s+carbon)\\\\b" } ] },
+        { "id": "q10", "text": "What are the 3 main materials that make up concrete?", "type": "short", "maxPoints": 3, "hint": "Read the first paragraph under Concrete on page 25 – it lists the three ingredients mixed together.", "rubric": [ { "points": 1, "check": "\\\\bcement\\\\b" }, { "points": 1, "check": "\\\\bwater\\\\b" }, { "points": 1, "check": "\\\\b(aggregate|sand|gravel|stone)\\\\b" } ] }
+      ]
+    },
+    {
+      "id": "24355-part4",
+      "title": "US 24355 Materials – Part 4",
+      "subtitle": "Paint Finishes (5 marks)",
+      "totalPoints": 5,
+      "questions": [
+        { "id": "q11", "text": "What is the function of a primer coat when painting?", "type": "long", "maxPoints": 2, "hint": "Check the description of Primer in the Paint section on page 26 – it talks about adhesion and protection.", "rubric": [ { "points": 1, "check": "\\\\b(seal|porous)" }, { "points": 1, "check": "\\\\b(adhesion|bond|stick|key)" } ] },
+        { "id": "q12", "text": "Identify 3 methods commonly used to apply paint.", "type": "short", "maxPoints": 3, "hint": "See the first paragraph under Surface finishes/ Paint on page 26 – three methods are listed there.", "rubric": [ { "points": 1, "check": "\\\\bbrush\\\\b" }, { "points": 1, "check": "\\\\broller\\\\b" }, { "points": 1, "check": "\\\\bspray\\\\b" } ] }
+      ]
+    },
+    {
+      "id": "24355-part5",
+      "title": "US 24355 Materials – Part 5",
+      "subtitle": "Polishes & Varnishes (7 marks)",
+      "totalPoints": 7,
+      "questions": [
+        { "id": "q13", "text": "Name 2 types of polishes and state an advantage over oil finishes.", "type": "long", "maxPoints": 3, "hint": "Compare the Oil section on page 27 with the Polish section on page 28 – look at wax polish and French polish.", "rubric": [ { "points": 1, "check": "\\\\b(wax|paste\\\\s+wax|beeswax)\\\\b" }, { "points": 1, "check": "\\\\b(french\\\\s+polish|shellac)\\\\b" }, { "points": 1, "check": "\\\\b(hard|durable|gloss|protective|resist)" } ] },
+        { "id": "q14", "text": "Name 2 types of varnishes and state an advantage of each.", "type": "long", "maxPoints": 4, "hint": "Read the Varnish section on page 27 – look for acrylic varnish and polyurethane and what each is good at.", "rubric": [ { "points": 1, "check": "\\\\bpolyurethane\\\\b" }, { "points": 1, "check": "polyurethane.*\\\\b(durable|tough|scratch|wear)" }, { "points": 1, "check": "\\\\b(water.?based|acrylic)\\\\b" }, { "points": 1, "check": "water.?based.*\\\\b(quick|fast.*dry|low.*odou?r|clear|non.?yellow)" } ] }
+      ]
+    }
+  ]
+}

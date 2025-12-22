@@ -1,0 +1,96 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Loading…</title>
+    <!-- Add a favicon for better browser tab appearance -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="stylesheet" href="styles.css">
+
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <!-- Replace this src with your actual crest image if needed -->
+        <img src="icon-192.png" alt="School Crest" class="crest" />
+        <div class="header-text">
+          <h1 id="app-title">Pukekohe High School</h1>
+          <p id="app-subtitle">Technology Assessment</p>
+        </div>
+      </header>
+
+      <div id="deadline-banner" class="deadline-banner hidden">
+        <span id="deadline-text"></span>
+      </div>
+
+      <section class="info">
+        <h2>Student Information</h2>
+        <div class="info-grid">
+          <div>
+            <label for="name">Student Name</label>
+            <input id="name" type="text" placeholder="Enter your full name">
+          </div>
+          <div>
+            <label for="id">Student ID</label>
+            <input id="id" type="text" placeholder="Enter your ID">
+            <div id="locked-msg" class="locked-msg hidden">
+              ID locked as <span id="locked-id"></span> for this device.
+            </div>
+          </div>
+          <div>
+            <label for="teacher">Teacher</label>
+            <select id="teacher">
+              <option value="">Select teacher</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="assessment">
+        <h2>Assessment</h2>
+        <div id="loading" class="loading">Loading questions…</div>
+        <div class="info-grid">
+          <div>
+            <label for="assessmentSelector">Assessment</label>
+            <select id="assessmentSelector">
+              <option value="">Select assessment</option>
+            </select>
+          </div>
+          
+        </div>
+
+        <div class="btn-group">
+          <button class="btn" onclick="loadAssessment()">Load Assessment</button>
+        </div>
+
+        <section class="form-section" id="form">
+          <div id="questions"></div>
+
+          <div class="btn-group">
+            <button class="btn" onclick="submitWork()">Submit &amp; Grade</button>
+          </div>
+        </section>
+      </section>
+
+      <section class="result-section hidden" id="result">
+        <div class="result-header">
+          <h2>Assessment Complete!</h2>
+          <p><strong id="student"></strong> to <span id="teacher-name"></span></p>
+          <div class="grade" id="grade"></div>
+        </div>
+        <div id="answers"></div>
+        <div class="btn-group">
+          <button class="btn" id="emailBtn" onclick="emailWork()" disabled>
+            Email via Default App
+          </button>
+          <button class="btn btn-secondary" onclick="back()">Back to Form</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Load the application logic. Using a regular script tag avoids issues with ES module loading via the file:// protocol. -->
+    <script src="script.js?v=10" defer></script>
+  </body>
+</html>

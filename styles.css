@@ -1,0 +1,547 @@
+/* ============================================================
+   THEME VARIABLES 
+   ============================================================ */
+:root {
+  --phs-maroon: #6e1818;
+  --phs-maroon-soft: #8b1f1f;
+  --bg-body: #f3f5fb;
+  --bg-card: #ffffff;
+  --bg-soft: #f8fafc;
+  --text-main: #1f2933;
+  --text-muted: #6b7b8f;
+  --border-subtle: #dde2eb;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --shadow-soft: 0 14px 30px rgba(15, 23, 42, 0.12);
+  --shadow-subtle: 0 4px 12px rgba(15, 23, 42, 0.08);
+  --transition-fast: 0.18s ease-out;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+
+/* ============================================================
+   GLOBAL RESET & BASE
+   ============================================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  min-height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(circle at top left, #ffffff 0, #f3f5fb 55%, #e4e9f5 100%);
+  color: var(--text-main);
+  line-height: 1.6;
+  padding: 32px 16px;
+}
+
+/* Main centred shell */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(5px);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  background: linear-gradient(135deg, var(--phs-maroon) 0%, #3b0d0d 100%);
+  color: #fff;
+  padding: 20px 26px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+header img.crest {
+  height: 64px;
+  width: auto;
+  flex-shrink: 0;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35));
+}
+
+header .header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+header h1 {
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+header p {
+  font-size: 0.96rem;
+  opacity: 0.92;
+}
+
+/* ============================================================
+   GENERIC SECTIONS
+   ============================================================ */
+
+.info,
+.assessment,
+.result-section {
+  padding: 22px 26px 24px;
+}
+
+.info,
+.assessment {
+  background: linear-gradient(to bottom, #ffffff 0%, var(--bg-soft) 100%);
+}
+
+/* Section headings */
+.info h2,
+.assessment h2,
+.result-section h2 {
+  margin-bottom: 16px;
+  color: var(--phs-maroon);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Thin underline accent on assessment heading */
+.assessment h2 {
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(110, 24, 24, 0.35);
+}
+
+/* Grid for Name / ID / Teacher etc. */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+/* Labels */
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+/* ============================================================
+   INPUTS / SELECTS / TEXTAREAS
+   ============================================================ */
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 11px;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(248, 250, 252, 0.9);
+  font-size: 0.97rem;
+  font-family: inherit;
+  color: var(--text-main);
+  line-height: 1.5;
+  transition: border var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #a0aec0;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--phs-maroon);
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(110, 24, 24, 0.4),
+              0 10px 22px rgba(15, 23, 42, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Textareas slightly taller by default */
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* ID locked helper text */
+.locked-msg {
+  font-size: 0.85rem;
+  color: #d35400;
+  margin-top: 4px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Locked fields (after deadline / ID lock) */
+.locked-field {
+  background: #f0f2f6;
+  border-color: #cbd2e1;
+  color: #7b8794;
+}
+
+/* ============================================================
+   QUESTION CARDS
+   ============================================================ */
+
+.question {
+  border-radius: var(--radius-lg);
+  padding: 16px 16px 14px;
+  margin-bottom: 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-subtle);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast), border var(--transition-fast), background var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft hover lift to make cards feel interactive */
+.question:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+}
+
+/* Header row (Q4 – 3 marks | Short answer) */
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+/* “Q4 – 3 marks” + “Short answer” badges */
+.question-header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #eef2f7;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Question text */
+.question p {
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+/* Optional image under the question */
+
+
+.question img {
+  display: block;              /* important: allows auto margins to work */
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin: 10px auto 12px;      /* centers horizontally */
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+/* ============================================================
+   MARKING STATES (Correct / Partial / Wrong)
+   ============================================================ */
+
+.question.correct {
+  border-color: #23a46a;
+  background: linear-gradient(135deg, #ecfbf3 0%, #ffffff 70%);
+  box-shadow: 0 10px 25px rgba(46, 204, 113, 0.25);
+}
+
+.question.partial {
+  border-color: #f1c40f;
+  background: linear-gradient(135deg, #fef9e7 0%, #ffffff 70%);
+  box-shadow: 0 10px 25px rgba(241, 196, 15, 0.25);
+}
+
+.question.wrong {
+  border-color: #e74c3c;
+  background: linear-gradient(135deg, #fdedec 0%, #ffffff 70%);
+  box-shadow: 0 10px 25px rgba(231, 76, 60, 0.20);
+}
+
+/* Optional status text */
+.question .status {
+  font-weight: 600;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.question .status.correct { color: #1f9d55; }
+.question .status.partial { color: #d89400; }
+.question .status.wrong   { color: #cf3c32; }
+
+/* ============================================================
+   INLINE HINTS UNDER QUESTIONS
+   ============================================================ */
+
+.hint-inline {
+  margin-top: 10px;
+  padding: 10px 11px;
+  border-radius: 10px;
+  background: #fff7dd;
+  border: 1px dashed #f0c96b;
+  font-size: 0.9rem;
+  color: #6b4d04;
+}
+
+.hint-inline strong {
+  font-weight: 700;
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   ============================================================ */
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--phs-maroon);
+  color: #fff;
+  padding: 11px 16px;
+  border-radius: 999px;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.45);
+  opacity: 0;
+  transform: translateY(16px) scale(0.96);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+  font-size: 0.9rem;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast.error {
+  background: #e74c3c;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--phs-maroon);
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  margin: 5px;
+  font-size: 0.97rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), opacity var(--transition-fast);
+  box-shadow: 0 6px 14px rgba(110, 24, 24, 0.35);
+}
+
+.btn:hover {
+  background: var(--phs-maroon-soft);
+  transform: translateY(-1px);
+  box-shadow: 0 9px 22px rgba(110, 24, 24, 0.45);
+}
+
+.btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Secondary (grey) buttons */
+.btn-secondary {
+  background: #6b7b8f;
+  box-shadow: 0 6px 14px rgba(107, 123, 143, 0.35);
+}
+
+.btn-secondary:hover {
+  background: #7f92ac;
+}
+
+/* Button group centred */
+.btn-group {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* ============================================================
+   RESULT SCREEN
+   ============================================================ */
+
+.result-section {
+  padding: 26px 26px 28px;
+  text-align: center;
+  background: #ffffff;
+}
+
+.result-header {
+  margin-bottom: 22px;
+}
+
+/* Score highlight */
+.grade {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--phs-maroon);
+  letter-spacing: 0.03em;
+}
+
+.grade small {
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 4px;
+}
+
+/* Feedback cards per question */
+.feedback {
+  text-align: left;
+  padding: 14px 14px 12px;
+  margin: 10px 0;
+  border-radius: var(--radius-md);
+  border: 1px solid #e2e8f0;
+  background: #f9fafb;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+  font-size: 0.93rem;
+}
+
+.feedback.correct {
+  border-color: #23a46a;
+  background: #edfdf4;
+}
+
+.feedback.partial {
+  border-color: #f1c40f;
+  background: #fffbe8;
+}
+
+.feedback.wrong {
+  border-color: #e74c3c;
+  background: #fff0ef;
+}
+
+.feedback h3 {
+  margin-bottom: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.feedback p {
+  margin: 3px 0;
+}
+
+/* ============================================================
+   MISC / UTILITIES
+   ============================================================ */
+
+/* Loading text */
+.loading {
+  text-align: center;
+  padding: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Sub-section divider inside forms */
+.form-section {
+  margin-top: 10px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 10px;
+}
+
+/* ============================================================
+   DEADLINE BANNER
+   ============================================================ */
+
+.deadline-banner {
+  padding: 9px 16px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Info / warning / hot / overdue colours */
+.deadline-banner.info {
+  background: #e8f4fd;
+  color: #1f2933;
+}
+
+.deadline-banner.warn {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.deadline-banner.hot {
+  background: #fdecea;
+  color: #c0392b;
+}
+
+.deadline-banner.over {
+  background: #f5b7b1;
+  color: #7b241c;
+}
+
+/* ============================================================
+   RESPONSIVE TWEAKS
+   ============================================================ */
+
+@media (max-width: 640px) {
+  body {
+    padding: 16px 10px;
+  }
+
+  .container {
+    border-radius: 18px;
+  }
+
+  header {
+    padding: 16px 18px;
+  }
+
+  header img.crest {
+    height: 52px;
+  }
+
+  .info,
+  .assessment,
+  .result-section {
+    padding: 18px 18px 20px;
+  }
+}
