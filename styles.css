@@ -256,13 +256,17 @@ textarea {
 
 
 .question img {
-  display: block;              /* important: allows auto margins to work */
+  display: block;
   max-width: 100%;
+  max-height: 340px;   /* change this */
   height: auto;
+  width: auto;
+  object-fit: contain;
   border-radius: 10px;
-  margin: 10px auto 12px;      /* centers horizontally */
+  margin: 10px auto 12px;
   border: 1px solid rgba(148, 163, 184, 0.35);
 }
+
 
 /* ============================================================
    MARKING STATES (Correct / Partial / Wrong)
