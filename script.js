@@ -8,24 +8,30 @@ let STORAGE_KEY;               // will be set after questions load
 let data = { answers: {} };    // default
 let currentAssessmentId = null; // track which assessment is loaded
 
-function initStorage(appId, version = 'noversion') {
+function initStorage(appId, version = "noversion") {
   STORAGE_KEY = `${appId}_${version}_DATA`;
 
-  // ---- migrate old TECH_DATA (run once) ----
-  const OLD_KEY = "TECH_DATA";
-  if (localStorage.getItem(OLD_KEY) && !localStorage.getItem(STORAGE_KEY)) {
-    try {
-      const old = JSON.parse(localStorage.getItem(OLD_KEY));
-      if (old?.answers) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(old));
+  // Migrate from previous version key (if new key missing)
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    const prevKey = findMostRecentStorageKeyForApp(appId, STORAGE_KEY);
+
+    if (prevKey) {
+      try {
+        const prev = JSON.parse(localStorage.getItem(prevKey));
+        if (prev && typeof prev === "object") {
+          prev.migratedFrom = prevKey;
+          prev.migratedAt = new Date().toISOString();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(prev));
+        }
+      } catch (e) {
+        console.warn("Migration from previous version failed:", e);
       }
-      localStorage.removeItem(OLD_KEY);
-    } catch (e) {
-      console.warn("Migration from TECH_DATA failed:", e);
     }
   }
 
-  // load existing data if present
+  // Load data from current key
+  data = { answers: {} };
+
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -35,7 +41,12 @@ function initStorage(appId, version = 'noversion') {
   } catch (e) {
     console.warn("Failed to parse stored data:", e);
   }
+
+  // OPTIONAL cleanup (⚠️ see warning below)
+  // cleanupOldVersionsKeepLatest(appId, 3, STORAGE_KEY);
+  // cleanupOldVersionsDeleteAll(appId, STORAGE_KEY);
 }
+
 
 // ------------------------------------------------------------
 // XOR obfuscation helpers
@@ -78,12 +89,152 @@ const DEBUG = false; // ← Debug logging off in production
 // ------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------
-const MIN_PCT_FOR_SUBMIT = 100;
+const MIN_PCT_FOR_SUBMIT = 10;
 // Change this to e.g. 80 if you want 80% or better
+
+function findMostRecentStorageKeyForApp(appId, currentKey) {
+  try {
+    const prefix = `${appId}_`;
+    let bestKey = null;
+    let bestLastSaved = 0;
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+
+      if (
+        k.startsWith(prefix) &&
+        k.endsWith("_DATA") &&
+        k !== currentKey
+      ) {
+        const raw = localStorage.getItem(k);
+        let lastSaved = 0;
+
+        try {
+          const parsed = JSON.parse(raw);
+          lastSaved = parsed?.lastSaved ? Date.parse(parsed.lastSaved) : 0;
+        } catch {}
+
+        // If no lastSaved, still consider it but it will sort low
+        if (!bestKey || lastSaved > bestLastSaved) {
+          bestKey = k;
+          bestLastSaved = lastSaved;
+        }
+      }
+    }
+
+    return bestKey;
+  } catch (e) {
+    console.warn("findMostRecentStorageKeyForApp failed:", e);
+    return null;
+  }
+}
+function cleanupOldVersionsDeleteAll(appId, currentKey) {
+  try {
+    const prefix = `${appId}_`;
+
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+
+      if (k.startsWith(prefix) && k.endsWith("_DATA") && k !== currentKey) {
+        localStorage.removeItem(k);
+      }
+    }
+  } catch (e) {
+    console.warn("cleanupOldVersionsDeleteAll failed:", e);
+  }
+}
+
 
 // ------------------------------------------------------------
 // Load questions.json (now also extracts APP_ID & VERSION & DEADLINE)
 // ------------------------------------------------------------
+async function loadScriptOnce(src) {
+  if (document.querySelector(`script[src="${src}"]`)) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = res;
+    s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function fetchOptionalPdfBytes(url) {
+  try {
+    const res = await fetch(url, { cache: "no-cache" });
+    if (!res.ok) return null;
+    const buf = await res.arrayBuffer();
+    if (!buf || buf.byteLength < 100) return null;
+    return buf;
+  } catch {
+    return null;
+  }
+}
+
+async function fillPdfForm(pdfBytes, finalData) {
+  // Load pdf-lib if needed
+  if (!window.PDFLib) {
+    await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js");
+  }
+  if (!window.PDFLib) throw new Error("pdf-lib failed to load");
+
+  const { PDFDocument } = window.PDFLib;
+
+  const doc = await PDFDocument.load(pdfBytes);
+  const form = doc.getForm();
+
+  // ✅ Fill fields by name
+  const safeSet = (fieldName, value) => {
+    try {
+      form.getTextField(fieldName).setText(value || "");
+    } catch (e) {
+      console.warn(`Field not found: ${fieldName}`);
+    }
+  };
+
+  safeSet("StudentName", finalData.studentName);
+  safeSet("AssessorName", finalData.teacherName);
+  safeSet("Date", new Date().toLocaleDateString("en-NZ")); // dd/mm/yyyy
+
+  // Optional extras
+  // safeSet("Result", finalData.pct >= 100 ? "A" : "N");
+  // safeSet("AssessorSignature", ""); // leave blank
+
+  // ✅ Make it print-ready and stop further editing
+  form.flatten();
+
+  return await doc.save();
+}
+
+async function appendPdfBytesToBlob(mainPdfBlob, extraPdfBytes) {
+  if (!window.PDFLib) {
+    await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js");
+  }
+  if (!window.PDFLib) throw new Error("pdf-lib failed to load");
+
+  const { PDFDocument } = window.PDFLib;
+
+  const mainBytes = await mainPdfBlob.arrayBuffer();
+  const mainDoc = await PDFDocument.load(mainBytes);
+  const extraDoc = await PDFDocument.load(extraPdfBytes);
+
+  const merged = await PDFDocument.create();
+
+  // main pages first
+  const mainPages = await merged.copyPages(mainDoc, mainDoc.getPageIndices());
+  mainPages.forEach(p => merged.addPage(p));
+
+  // extra pages last
+  const extraPages = await merged.copyPages(extraDoc, extraDoc.getPageIndices());
+  extraPages.forEach(p => merged.addPage(p));
+
+  const mergedBytes = await merged.save();
+  return new Blob([mergedBytes], { type: "application/pdf" });
+}
+
+
 async function loadQuestions() {
   const loadingEl = document.getElementById("loading");
   if (loadingEl) loadingEl.textContent = "Loading questions…";
@@ -187,6 +338,7 @@ function saveAnswer(qid) {
     data.answers[currentAssessmentId] = {};
   }
   data.answers[currentAssessmentId][qid] = xorEncode(val);
+  data.lastSaved = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
@@ -226,6 +378,7 @@ function saveStudentInfo() {
   data.name = document.getElementById("name").value.trim();
   data.id = document.getElementById("id").value.trim();
   data.teacher = document.getElementById("teacher").value;
+  data.lastSaved = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
@@ -289,12 +442,26 @@ function loadAssessment() {
     p.innerHTML = q.text;
     wrap.appendChild(p);
 
-    if (q.image) {
-      const img = document.createElement("img");
-      img.src = q.image;
-      img.alt = "Question image";
-      wrap.appendChild(img);
+if (q.image) {
+  const img = document.createElement("img");
+  img.alt = "Question image";
+  img.loading = "lazy"; // optional
+
+  img.onerror = function () {
+    // prevent infinite loop if blank.jpg is also missing
+    if (!this.dataset.fallbackTried) {
+      this.dataset.fallbackTried = "1";
+      this.src = "blank.jpg"; // or "images/blank.jpg" if it's in a folder
+    } else {
+      // last resort: hide the broken image icon
+      this.style.display = "none";
     }
+  };
+
+  img.src = q.image;
+  wrap.appendChild(img);
+}
+
 
     let field;
     const fieldId = "q" + q.id;
@@ -572,38 +739,69 @@ function submitWork() {
   const answersDiv = document.getElementById("answers");
   answersDiv.innerHTML = "";
 
-  results.forEach(r => {
-    const fb = document.createElement("div");
-    const status =
-      r.earned === r.max ? "correct" :
-      r.earned > 0       ? "partial" :
-                           "wrong";
-    fb.className = `feedback ${status}`;
-    fb.innerHTML = `
-      <h3>${r.id}: ${r.text}</h3>
-      <p><strong>Your answer:</strong> ${r.answer || "<em>No answer provided</em>"}</p>
-      <p><strong>Result:</strong> ${
-        status === "correct" ? "Correct" :
-        status === "partial" ? "Partially correct" :
-                               "Incorrect"
-      } (${r.earned}/${r.max} marks)</p>
-    `;
-    answersDiv.appendChild(fb);
-  });
+ results.forEach(r => {
+  const fb = document.createElement("div");
+
+  const status =
+    r.earned === r.max ? "correct" :
+    r.earned > 0       ? "partial" :
+                         "wrong";
+
+  fb.className = `feedback ${status}`;
+
+  // --- Title (question text may contain HTML from your JSON, keep as-is if you want formatting)
+  const h3 = document.createElement("h3");
+  h3.innerHTML = `${r.id}: ${r.text}`;  // r.text comes from your JSON, not the student
+  fb.appendChild(h3);
+
+  // --- Student answer (MUST be textContent to prevent XSS)
+  const pAns = document.createElement("p");
+  const strongAns = document.createElement("strong");
+  strongAns.textContent = "Your answer: ";
+  pAns.appendChild(strongAns);
+
+  const ansSpan = document.createElement("span");
+  ansSpan.textContent = r.answer ? r.answer : "No answer provided";
+  pAns.appendChild(ansSpan);
+
+  fb.appendChild(pAns);
+
+  // --- Result line
+  const pRes = document.createElement("p");
+  const strongRes = document.createElement("strong");
+  strongRes.textContent = "Result: ";
+  pRes.appendChild(strongRes);
+
+  const statusText =
+    status === "correct" ? "Correct" :
+    status === "partial" ? "Partially correct" :
+                           "Incorrect";
+
+  const resSpan = document.createElement("span");
+  resSpan.textContent = `${statusText} (${r.earned}/${r.max} marks)`;
+  pRes.appendChild(resSpan);
+
+  fb.appendChild(pRes);
+
+  answersDiv.appendChild(fb);
+});
+
 
   const deadlineNow = getDeadlineStatus(new Date());
 
-  finalData = {
-    studentName,
-    studentId: document.getElementById("id").value.trim(),
-    teacherName,
-    assessmentTitle: ASSESSMENTS[assSel.value].title,
-    assessmentSubtitle: ASSESSMENTS[assSel.value].subtitle || "",
-    points: total,
-    totalPoints,
-    pct,
-    deadlineInfo: deadlineNow
-  };
+ finalData = {
+  studentName,
+  studentId: document.getElementById("id").value.trim(),
+  teacherName,
+  assessmentTitle: ASSESSMENTS[assSel.value].title,
+  assessmentSubtitle: ASSESSMENTS[assSel.value].subtitle || "",
+  attachSignoff: !!ASSESSMENTS[assSel.value].attachSignoff,
+  points: total,
+  totalPoints,
+  pct,
+  deadlineInfo: deadlineNow
+};
+
 
   const emailBtn = document.getElementById("emailBtn");
   if (pct >= MIN_PCT_FOR_SUBMIT && (!deadlineNow || deadlineNow.status !== "overdue")) {
@@ -631,6 +829,12 @@ function back() {
 // Email / PDF – streamlined header: ONLY deadline-relative submission line
 // + filename StudentNo_StudentName_AssessmentTitle.pdf
 // ------------------------------------------------------------
+
+
+
+
+
+
 async function emailWork() {
   if (!finalData) return alert("Submit first!");
 
@@ -649,19 +853,12 @@ async function emailWork() {
       .replace(/\s+/g, "_")
       .replace(/[^a-zA-Z0-9_\-]/g, "");
 
-  // Dynamically load jsPDF + html2canvas if needed
-  const load = src => new Promise((res, rej) => {
-    const s = document.createElement("script");
-    s.src = src;
-    s.onload = res;
-    s.onerror = rej;
-    document.head.appendChild(s);
-  });
 
-  if (!(window.jspdf && window.html2canvas)) {
-    await load("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
-    await load("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
-  }
+ if (!(window.jspdf && window.html2canvas)) {
+  await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+  await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+}
+
 
   if (!window.jspdf || !window.html2canvas) {
     alert("PDF libraries failed to load. Please check your internet connection.");
@@ -828,8 +1025,24 @@ async function emailWork() {
     pdf.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 6, { align: "center" });
   }
 
-  const pdfBlob = pdf.output("blob");
+let pdfBlob = pdf.output("blob");
 
+// ✅ Fill + append sign-off sheet as last page(s)
+// ✅ Fill + append sign-off sheet ONLY if assessment title contains the word "final"
+if (finalData.attachSignoff) {
+  try {
+    const signoffBytes = await fetchOptionalPdfBytes("assessment.pdf");
+
+    if (signoffBytes) {
+      const filledBytes = await fillPdfForm(signoffBytes, finalData);
+      pdfBlob = await appendPdfBytesToBlob(pdfBlob, filledBytes);
+    }
+  } catch (e) {
+    console.warn("Sign-off sheet fill/append failed, continuing without it:", e);
+  }
+}
+
+  
   const fileName =
     `${safePart(finalData.studentId || "student")}_` +
     `${safePart(finalData.studentName || "name")}_` +
