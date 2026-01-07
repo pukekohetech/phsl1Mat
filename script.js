@@ -581,6 +581,17 @@ function colourQuestions(results) {
   });
 }
 
+
+function enablePdfMode() {
+  const result = document.getElementById("result");
+  if (result) result.classList.add("pdf-mode");
+}
+
+function disablePdfMode() {
+  const result = document.getElementById("result");
+  if (result) result.classList.remove("pdf-mode");
+}
+
 // ------------------------------------------------------------
 // Deadline helpers
 // ------------------------------------------------------------
