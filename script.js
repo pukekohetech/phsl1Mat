@@ -1005,16 +1005,7 @@ try {
       scrollY: -window.scrollY
     });
 
-    
-  for (const block of blocks) {
-    const canvas = await window.html2canvas(block, {
-      scale: 1.5,
-      width: TARGET_WIDTH,
-      windowWidth: TARGET_WIDTH,
-      useCORS: true,
-      scrollX: 0,
-      scrollY: -window.scrollY
-    });
+  
 
     const imgData = canvas.toDataURL("image/jpeg", 0.8);
     const imgProps = pdf.getImageProperties(imgData);
