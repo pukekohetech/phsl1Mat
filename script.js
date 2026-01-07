@@ -990,7 +990,7 @@ async function emailWork() {
       scrollY: -window.scrollY
     });
 
-    const imgData = canvas.toDataURL("image/png");
+    const imgData = canvas.toDataURL("image/jpeg", 0.8);
     const imgProps = pdf.getImageProperties(imgData);
 
     const maxContentWidth = pageWidth - marginLeft - marginRight;
@@ -1012,7 +1012,7 @@ async function emailWork() {
       currentY = marginTop;
     }
 
-    pdf.addImage(imgData, "PNG", xPos, currentY, imgWidth, imgHeight);
+    pdf.addImage(imgData, "JPG", xPos, currentY, imgWidth, imgHeight);
     currentY += imgHeight + 5;
   }
 
@@ -1128,4 +1128,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadQuestions();
   initApp();
   applyDeadlineLockIfNeeded();
+
+  // Preload libs quietly
+  loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+  loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+  loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js");
 });
