@@ -522,6 +522,29 @@ textarea {
   color: #7b241c;
 }
 
+
+/* ------------------------------------------------------------
+   PDF MODE: Force system fonts for html2canvas capture
+   ------------------------------------------------------------ */
+.pdf-mode,
+.pdf-mode * {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+/* Optional: stop fancy smoothing differences across devices */
+.pdf-mode {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+/* Optional: reduce shadows/filters (speeds up capture) */
+.pdf-mode .feedback,
+.pdf-mode .question,
+.pdf-mode .result-header {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
 /* ============================================================
    RESPONSIVE TWEAKS
    ============================================================ */
