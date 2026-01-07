@@ -991,6 +991,21 @@ async function emailWork() {
   drawHeader(true);
   let currentY = marginTop;
 
+enablePdfMode();
+await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+try {
+  for (const block of blocks) {
+    const canvas = await window.html2canvas(block, {
+      scale: 1.5,
+      width: TARGET_WIDTH,
+      windowWidth: TARGET_WIDTH,
+      useCORS: true,
+      scrollX: 0,
+      scrollY: -window.scrollY
+    });
+
+    
   for (const block of blocks) {
     const canvas = await window.html2canvas(block, {
       scale: 1.5,
@@ -1026,6 +1041,11 @@ async function emailWork() {
     pdf.addImage(imgData, "JPG", xPos, currentY, imgWidth, imgHeight);
     currentY += imgHeight + 5;
   }
+
+      }
+} finally {
+  disablePdfMode();
+}
 
   // Page numbers
   const pageCount = pdf.getNumberOfPages();
@@ -1085,6 +1105,8 @@ if (finalData.attachSignoff) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+  
 
 // ------------------------------------------------------------
 // Simple clipboard clear (best-effort)
