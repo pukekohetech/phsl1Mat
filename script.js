@@ -1029,7 +1029,7 @@ try {
       currentY = marginTop;
     }
 
-    pdf.addImage(imgData, "JPG", xPos, currentY, imgWidth, imgHeight);
+    pdf.addImage(imgData, "JPEG", xPos, currentY, imgWidth, imgHeight);
     currentY += imgHeight + 5;
   }
 
