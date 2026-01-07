@@ -1,5 +1,6 @@
 // sw.js – Offline-first PWA (SAFE VERSION)
-const CACHE_NAME = "phs-safety-l1-v2";
+
+const CACHE_NAME = "phs-safety-l1-v3";
 
 const CORE_ASSETS = [
   "./",
@@ -12,6 +13,9 @@ const CORE_ASSETS = [
   "./icon-512.png",
 ];
 
+// ---------------------------
+// Install: cache core assets
+// ---------------------------
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
@@ -19,6 +23,9 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
+// ---------------------------
+// Activate: delete old caches
+// ---------------------------
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
@@ -28,19 +35,26 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// ---------------------------
+// Fetch handler
+// ---------------------------
 self.addEventListener("fetch", (event) => {
   const req = event.request;
-  const url = new URL(req.url);
 
-  // Only handle GET
+  // Only handle GET requests
   if (req.method !== "GET") return;
 
-  // ✅ Do NOT intercept Google Fonts (prevents font decode / OTS errors)
-  if (url.hostname.includes("fonts.googleapis.com") || url.hostname.includes("fonts.gstatic.com")) {
-    return;
+  const url = new URL(req.url);
+
+  // ✅ Never intercept Google Fonts (prevents OTS / decode errors)
+  if (
+    url.hostname.includes("fonts.googleapis.com") ||
+    url.hostname.includes("fonts.gstatic.com")
+  ) {
+    return; // let browser handle normally
   }
 
-  // ✅ Navigation requests (page loads) get index.html fallback
+  // ✅ Navigation requests: network first, fallback to cached index.html
   if (req.mode === "navigate") {
     event.respondWith(
       fetch(req).catch(() => caches.match("./index.html"))
@@ -48,23 +62,28 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // ✅ Static assets: cache-first, then network
+  // ✅ Only cache same-origin assets (your own files)
+  if (url.origin !== self.location.origin) {
+    return; // let browser handle normally
+  }
+
+  // ✅ Cache-first for same-origin static assets
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached;
 
       return fetch(req)
         .then((res) => {
-          // Only cache "ok" responses (avoid caching opaque / error responses)
-          if (!res || res.status !== 200 || res.type === "opaque") return res;
+          // Only cache successful basic responses (avoid caching bad/opaque)
+          if (!res || res.status !== 200 || res.type !== "basic") return res;
 
-          const resClone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, resClone));
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
           return res;
         })
         .catch(() => {
-          // ❌ NO index.html fallback for assets!
-          return undefined;
+          // No fallback for assets
+          return new Response("", { status: 504, statusText: "Offline" });
         });
     })
   );
