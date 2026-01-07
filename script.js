@@ -1033,7 +1033,7 @@ try {
     currentY += imgHeight + 5;
   }
 
-      }
+      
 } finally {
   disablePdfMode();
 }
