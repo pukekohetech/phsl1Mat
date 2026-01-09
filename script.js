@@ -1,5 +1,3 @@
-/* script.js – US 24355 app: FINAL + DEADLINE + HINTS ONLY UNDER QUESTIONS */
-/* Streamlined PDF header: shows ONLY "Submitted early/today/late" line (no Submitted/PDF Generated lines) */
 
 // ------------------------------------------------------------
 // Local storage – now dynamic & versioned
@@ -89,7 +87,7 @@ const DEBUG = false; // ← Debug logging off in production
 // ------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------
-const MIN_PCT_FOR_SUBMIT = 1;
+const MIN_PCT_FOR_SUBMIT = 100;
 // Change this to e.g. 80 if you want 80% or better
 
 function findMostRecentStorageKeyForApp(appId, currentKey) {
@@ -173,6 +171,13 @@ async function fetchOptionalPdfBytes(url) {
   }
 }
 
+function getStudentEmail(studentId) {
+  const id = (studentId || "").trim();
+  if (!id) return "";
+  return `${id}@pukekohehigh.school.nz`;
+}
+
+
 async function fillPdfForm(pdfBytes, finalData) {
   // Load pdf-lib if needed
   if (!window.PDFLib) {
@@ -194,12 +199,14 @@ async function fillPdfForm(pdfBytes, finalData) {
     }
   };
 
-  safeSet("StudentName", finalData.studentName);
+//  safeSet("StudentName", finalData.studentName);
+  const studentEmail = getStudentEmail(finalData.studentId);
+safeSet("StudentName", `${finalData.studentName} ${studentEmail}`.trim());
   safeSet("AssessorName", finalData.teacherName);
   safeSet("Date", new Date().toLocaleDateString("en-NZ")); // dd/mm/yyyy
 
   // Optional extras
-  // safeSet("Result", finalData.pct >= 100 ? "A" : "N");
+   safeSet("Result", finalData.pct >= 100 ? "A" : "N");
   // safeSet("AssessorSignature", ""); // leave blank
 
   // ✅ Make it print-ready and stop further editing
