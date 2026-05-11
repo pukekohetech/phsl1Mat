@@ -565,7 +565,7 @@
             },
             {
               "points": 1,
-              "check": "wax|wax polish|briwax|beezwax|paste wax|furniture wax|carnauba",
+              "check": "wax|wax polish|briwax|beeswax|paste wax|furniture wax|carnauba",
               "flags": "i"
             },
             {
