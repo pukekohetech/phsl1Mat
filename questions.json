@@ -432,13 +432,7 @@
           "hint": "Look under Polythene in the Plastics section – what sheet is used as a DPM under concrete? (Page 22)",
           "type": "short",
           "maxPoints": 1,
-          "rubric": [
-            {
-              "points": 1,
-              "check": "polyth.?ene|polyethylene|plastic sheet|DPM|damp.?proof.?membrane|black plastic|200.?micron|250.?micron",
-              "flags": "i"
-            }
-          ]
+         "check": "polyth.?ene|polyethylene|poly\\s*sheet|plastic\\s*sheet|DPM|damp.?proof.?membrane|vapou?r\\s*barrier|black\\s*plastic|200.?micron|250.?micron"
         },
         {
           "id": "q11",
@@ -447,28 +441,23 @@
           "hint": "See Concrete section – list the three core components. (Page 25)",
           "type": "short",
           "maxPoints": 3,
-          "rubric": [
-            {
-              "points": 1,
-              "check": "cement|portland cement|gp cement|general purpose cement",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "aggregate|stone|gravel|rocks?|metal|coarse aggregate|10 ?mm|20 ?mm",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "sand|fine aggregate|sharp sand|building sand|plaster sand",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "water",
-              "flags": "i"
-            }
-          ]
+         "rubric": [
+  {
+    "points": 1,
+    "check": "\\bcement\\b|portland\\s*cement|gp\\s*cement|general\\s*purpose\\s*cement",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "\\baggregate\\b|gravel|stone|stones|rocks?|metal|sand|fine\\s*aggregate|coarse\\s*aggregate",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "\\bwater\\b",
+    "flags": "i"
+  }
+]
         },
         {
           "id": "q12",
@@ -477,43 +466,33 @@
           "hint": "See Paint section – what does primer do for adhesion, sealing, and protection? (Page 26)",
           "type": "long",
           "maxPoints": 4,
-          "rubric": [
-            {
-              "points": 1,
-              "check": "seal|se-cancel|seals?.*surface|close.*pores|stop.*absorption|seal.*timber|seal.*mdf|seal.*plaster",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "adhesion|stick|bond|grip|top.?coat.*stick|better adhesion|promote.*adhesion",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "even.*finish|uniform.*surface|smooth.*base|consistent.*absorption|stop.*patchy|even.*colour",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "block.*stain|stop.*bleed|stain.*block|stop.*tannin|prevent.*tannin|knot.*bleed",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "rust.*inhib|stop.*rust|corrosion.*resist|metal primer|protection.*steel",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "under.?coat|base.?coat|first coat|prepar|prime.*surface",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "save.*paint|less top.?coat|reduce.*topcoat|economical|use.*less",
-              "flags": "i"
-            }
-          ]
+         "rubric": [
+  {
+    "points": 1,
+    "check": "primer|priming|preparatory\\s*coat|prepares?.*surface|first\\s*coat|prime.*surface",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "adhesion|stick|sticks?.*better|bond|grip|paint.*stick|top.?coat.*stick|helps?.*paint.*stick",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "seal|seals?.*surface|seal.*timber|seal.*mdf|seal.*plaster|close.*pores|stop.*absorption|reduce.*absorption",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "durab|lasts?.*longer|longer.?lasting|harder.?wearing|protect|protection|protective|additional\\s*protection",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "even.*finish|uniform.*surface|smooth.*base|consistent.*absorption|stop.*patchy|even.*colour|even.*color",
+    "flags": "i"
+  }
+]
         },
         {
           "id": "q13",
@@ -607,58 +586,48 @@
           "hint": "See Varnish section – note the two types and their key benefits (drying, durability, etc.). (Page 27)",
           "type": "long",
           "maxPoints": 4,
-          "rubric": [
-            {
-              "points": 1,
-              "check": "polyurethane|poly|polyurethane varnish|two.?pack|2.?pack|clear polyurethane|dulux.*poly|resene.*poly",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "acrylic|water.?based|water.?borne|aqua.*varnish|resene.*aqua|low odour|quick.?dry",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "yacht|spar|marine|exterior varnish|tung oil.*varnish|epifanes|boiled linseed",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "oil.?based|traditional|alkyd|solvent.?based|harder film|deeper gloss",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "very hard|tough|durable|scratch.*resist|wear.*resist|long.?lasting|strong film|best protection",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "waterproof|water.?resist|good.*moisture|exterior.*ok|spill.*proof",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "quick.*dry|fast.*dry|dries?.*fast|low odour|low smell|no fumes|non.?yellow|clearer|easy clean|water clean",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "non.?yellow|doesn'?t yellow|stays?.*clear|won'?t amber|colourless",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "uv.*resist|sun.*resist|weather.*resist|exterior|outdoor|marine|flexible|won'?t crack|high gloss",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "deep.*gloss|rich.*finish|high.*shine|feeds?.*wood|penetrates|traditional look",
-              "flags": "i"
-            }
-          ]
+         "rubric": [
+  {
+    "points": 1,
+    "check": "\\bacrylic\\s*varnish\\b|\\bwater.?based\\s*varnish\\b|\\bwater.?borne\\s*varnish\\b",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "\\bpolyurethane\\b|\\bpoly\\s*varnish\\b|\\bclear\\s*poly\\b",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "\\bsanding\\s*sealer\\b|\\bsealer\\b",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "\\blacquer\\b",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "quick.?dry|fast.?dry|dries?.*quick|non.?toxic|low.?toxic|water.?clean|rinsed?.*water|clean.*water",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "hard.?wearing|hardwearing|resilient|durable|tough|protective|hard.*surface|strong.*finish",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "raise.*grain|smooth.*surface|smooth.*base|seal.*wood|seal.*timber|topcoat.*same.*day|seal.*topcoat",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "hard.*durable|durable.*finish|solvent.?based|especially.*hard|hard.*finish",
+    "flags": "i"
+  }
+]
         }
       ]
     },
