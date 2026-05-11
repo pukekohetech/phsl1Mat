@@ -557,43 +557,48 @@
           "hint": "See Polishes – name two types and compare durability to oil. (Page 28)",
           "type": "long",
           "maxPoints": 4,
-          "rubric": [
-            {
-              "points": 1,
-              "check": "french polish|shellac|button polish|garnet polish",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "wax|wax polish|briwax|beeswax|paste wax|furniture wax|carnauba",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "oil.*polish|liber.*wax|liber.*polish|antique.*wax",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "harder|more durable|longer.?lasting|better wear|harder surface|scratch.*resist|more protective|higher protection",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "gloss|shine|mirror|deep.*shine|high.*gloss|glossier|brighter finish|more lustre",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "water.*resist|spill.*proof|water.?proof|alcohol.*resist|ring.*resist|mark.*resist|better stain resist",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "build.*film|film.*finish|builds?.*thickness|hard film|surface coat",
-              "flags": "i"
-            }
-          ]
+         "rubric": [
+  {
+    "points": 1,
+    "check": "french\\s*polish|frenching|shellac|button\\s*polish|garnet\\s*polish|spirit\\s*polish",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "wax\\s*polish|\\bwax\\b|beeswax|beezwax|briwax|paste\\s*wax|furniture\\s*wax|carnauba|carnauba\\s*wax",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "\\boil\\s*polish\\b|liberon\\s*(wax|polish)|antique\\s*wax|finishing\\s*wax",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "harder|hard\\s*(wearing|wear)|more\\s*durable|durable|longer.?lasting|lasts?\\s*longer|better\\s*wear|wears?\\s*better|harder\\s*surface|tougher|stronger\\s*finish|scratch.*resist|resist.*scratch|more\\s*protective|protective\\s*coating|protects?\\s*(the\\s*)?(wood|timber)|higher\\s*protection|better\\s*protection",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "gloss|shine|shiny|sheen|natural\\s*sheen|mirror|deep.*shine|high.*gloss|glossier|brighter\\s*finish|lustre|luster|polished\\s*look|smooth\\s*finish|better\\s*finish",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "water.*resist|resist.*water|spill.*proof|spill.*resist|water.?proof|alcohol.*resist|ring.*resist|mark.*resist|stain.*resist|resist.*stain|better\\s*stain\\s*resist|seals?\\s*(the\\s*)?(wood|timber|surface)|helps?\\s*seal|sealed\\s*surface|protects?\\s*against\\s*(water|spills|marks|stains)",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "build.*film|film.*finish|builds?.*thickness|hard\\s*film|surface\\s*coat|surface\\s*coating|protective\\s*coat|protective\\s*coating|coats?\\s*(the\\s*)?(wood|timber|surface)|forms?\\s*(a\\s*)?(coat|coating|layer|film)",
+    "flags": "i"
+  },
+  {
+    "points": 1,
+    "check": "doesn'?t\\s*fade|does\\s*not\\s*fade|won'?t\\s*fade|less\\s*fading|keeps?\\s*(its\\s*)?(colour|color|finish|appearance)|maintains?\\s*(the\\s*)?(finish|look|appearance)|stays?\\s*(looking\\s*)?(good|new|polished)",
+    "flags": "i"
+  }
+]
         },
         {
           "id": "q15",
