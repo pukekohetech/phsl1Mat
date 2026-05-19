@@ -1,9 +1,17 @@
+// ============================================================
+// assessment.js — PHS Safety Knowledge (single-file logic)
+// Preserves all existing features from your LAST working version,
+// and ADDS:
+//   ✅ Ctrl+S  -> export encrypted progress file (.puk)
+//   ✅ Ctrl+L  -> import encrypted progress file (.puk) ONLY if Student ID matches
+// Encryption: AES-GCM with PBKDF2 key derived from Student ID
+// ============================================================
 
 // ------------------------------------------------------------
 // Local storage – now dynamic & versioned
 // ------------------------------------------------------------
-let STORAGE_KEY;               // will be set after questions load
-let data = { answers: {} };    // default
+let STORAGE_KEY;                // set after questions load
+let data = { answers: {} };     // default
 let currentAssessmentId = null; // track which assessment is loaded
 
 function initStorage(appId, version = "noversion") {
@@ -45,28 +53,27 @@ function initStorage(appId, version = "noversion") {
   // cleanupOldVersionsDeleteAll(appId, STORAGE_KEY);
 }
 
-
 // ------------------------------------------------------------
-// XOR obfuscation helpers
+// XOR obfuscation helpers (existing behaviour preserved)
 // ------------------------------------------------------------
 const XOR_KEY = 47;
 
-const xorEncode = s => {
+const xorEncode = (s) => {
   if (!s) return "";
   return btoa(
     s
       .split("")
-      .map(c => String.fromCharCode(c.charCodeAt(0) ^ XOR_KEY))
+      .map((c) => String.fromCharCode(c.charCodeAt(0) ^ XOR_KEY))
       .join("")
   );
 };
 
-const xorDecode = s => {
+const xorDecode = (s) => {
   if (!s) return "";
   try {
     return atob(s)
       .split("")
-      .map(c => String.fromCharCode(c.charCodeAt(0) ^ XOR_KEY))
+      .map((c) => String.fromCharCode(c.charCodeAt(0) ^ XOR_KEY))
       .join("");
   } catch (_) {
     return "";
@@ -87,8 +94,7 @@ const DEBUG = false; // ← Debug logging off in production
 // ------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------
-const MIN_PCT_FOR_SUBMIT = 100;
-// Change this to e.g. 80 if you want 80% or better
+const MIN_PCT_FOR_SUBMIT = 100; // Change to e.g. 80 if you want 80% or better
 
 function findMostRecentStorageKeyForApp(appId, currentKey) {
   try {
@@ -100,11 +106,7 @@ function findMostRecentStorageKeyForApp(appId, currentKey) {
       const k = localStorage.key(i);
       if (!k) continue;
 
-      if (
-        k.startsWith(prefix) &&
-        k.endsWith("_DATA") &&
-        k !== currentKey
-      ) {
+      if (k.startsWith(prefix) && k.endsWith("_DATA") && k !== currentKey) {
         const raw = localStorage.getItem(k);
         let lastSaved = 0;
 
@@ -113,7 +115,6 @@ function findMostRecentStorageKeyForApp(appId, currentKey) {
           lastSaved = parsed?.lastSaved ? Date.parse(parsed.lastSaved) : 0;
         } catch {}
 
-        // If no lastSaved, still consider it but it will sort low
         if (!bestKey || lastSaved > bestLastSaved) {
           bestKey = k;
           bestLastSaved = lastSaved;
@@ -127,6 +128,7 @@ function findMostRecentStorageKeyForApp(appId, currentKey) {
     return null;
   }
 }
+
 function cleanupOldVersionsDeleteAll(appId, currentKey) {
   try {
     const prefix = `${appId}_`;
@@ -144,9 +146,8 @@ function cleanupOldVersionsDeleteAll(appId, currentKey) {
   }
 }
 
-
 // ------------------------------------------------------------
-// Load questions.json (now also extracts APP_ID & VERSION & DEADLINE)
+// Load questions.json (also extracts APP_ID & VERSION & DEADLINE)
 // ------------------------------------------------------------
 async function loadScriptOnce(src) {
   if (document.querySelector(`script[src="${src}"]`)) return;
@@ -177,11 +178,11 @@ function getStudentEmail(studentId) {
   return `${id}@pukekohehigh.school.nz`;
 }
 
-
 async function fillPdfForm(pdfBytes, finalData) {
-  // Load pdf-lib if needed
   if (!window.PDFLib) {
-    await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js");
+    await loadScriptOnce(
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"
+    );
   }
   if (!window.PDFLib) throw new Error("pdf-lib failed to load");
 
@@ -190,7 +191,24 @@ async function fillPdfForm(pdfBytes, finalData) {
   const doc = await PDFDocument.load(pdfBytes);
   const form = doc.getForm();
 
-  // ✅ Fill fields by name
+  const safeSetMany = (nameLike, value) => {
+    try {
+      form.getFields().forEach((f) => {
+        try {
+          const n = f.getName();
+          if (n.toLowerCase().includes(nameLike.toLowerCase())) {
+            if (typeof f.setText === "function") {
+              f.setText(value || "");
+            }
+          }
+        } catch {}
+      });
+    } catch (e) {
+      console.warn(`safeSetMany failed for: ${nameLike}`, e);
+    }
+  };
+
+  // (kept for compatibility / logs)
   const safeSet = (fieldName, value) => {
     try {
       form.getTextField(fieldName).setText(value || "");
@@ -199,25 +217,23 @@ async function fillPdfForm(pdfBytes, finalData) {
     }
   };
 
-//  safeSet("StudentName", finalData.studentName);
   const studentEmail = getStudentEmail(finalData.studentId);
-safeSet("StudentName", `${finalData.studentName} ${studentEmail}`.trim());
-  safeSet("AssessorName", finalData.teacherName);
-  safeSet("Date", new Date().toLocaleDateString("en-NZ")); // dd/mm/yyyy
+  const studentCombined = `${finalData.studentName} ${studentEmail}`.trim();
 
-  // Optional extras
-   safeSet("Result", finalData.pct >= 100 ? "A" : "N");
-  // safeSet("AssessorSignature", ""); // leave blank
+  safeSetMany("StudentName", studentCombined);
+  safeSetMany("AssessorName", finalData.teacherName);
+  safeSetMany("Date", new Date().toLocaleDateString("en-NZ"));
+  safeSetMany("Result", finalData.pct >= 100 ? "A" : "N");
 
-  // ✅ Make it print-ready and stop further editing
   form.flatten();
-
   return await doc.save();
 }
 
 async function appendPdfBytesToBlob(mainPdfBlob, extraPdfBytes) {
   if (!window.PDFLib) {
-    await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js");
+    await loadScriptOnce(
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"
+    );
   }
   if (!window.PDFLib) throw new Error("pdf-lib failed to load");
 
@@ -229,18 +245,15 @@ async function appendPdfBytesToBlob(mainPdfBlob, extraPdfBytes) {
 
   const merged = await PDFDocument.create();
 
-  // main pages first
   const mainPages = await merged.copyPages(mainDoc, mainDoc.getPageIndices());
-  mainPages.forEach(p => merged.addPage(p));
+  mainPages.forEach((p) => merged.addPage(p));
 
-  // extra pages last
   const extraPages = await merged.copyPages(extraDoc, extraDoc.getPageIndices());
-  extraPages.forEach(p => merged.addPage(p));
+  extraPages.forEach((p) => merged.addPage(p));
 
   const mergedBytes = await merged.save();
   return new Blob([mergedBytes], { type: "application/pdf" });
 }
-
 
 async function loadQuestions() {
   const loadingEl = document.getElementById("loading");
@@ -251,27 +264,27 @@ async function loadQuestions() {
     const json = await res.json();
     if (DEBUG) console.log("JSON loaded:", json);
 
-    // ---- read APP_ID & VERSION ----
     const appId = json.APP_ID;
     const version = json.VERSION || "noversion";
     if (!appId) throw new Error("questions.json missing APP_ID");
-    initStorage(appId, version);   // ← creates STORAGE_KEY & loads data
+    initStorage(appId, version);
 
     APP_TITLE = json.APP_TITLE;
     APP_SUBTITLE = json.APP_SUBTITLE;
     TEACHERS = json.TEACHERS;
     DEADLINE = json.DEADLINE || null;
 
-    ASSESSMENTS = (json.ASSESSMENTS || []).map(ass => ({
+    ASSESSMENTS = (json.ASSESSMENTS || []).map((ass) => ({
       ...ass,
-      questions: ass.questions.map(q => ({
+      questions: ass.questions.map((q) => ({
         ...q,
-        rubric: (q.rubric || []).map(r => ({
+        rubric: (q.rubric || []).map((r) => ({
           ...r,
-          check: new RegExp(r.check, r.flags || "i")
-        }))
-      }))
+          check: new RegExp(r.check, r.flags || "i"),
+        })),
+      })),
     }));
+
     if (DEBUG) console.log("ASSESSMENTS ready:", ASSESSMENTS);
   } catch (err) {
     console.error("Failed to load questions.json:", err);
@@ -298,7 +311,7 @@ function initApp() {
 
   // Teacher dropdown
   const teacherSel = document.getElementById("teacher");
-  TEACHERS.forEach(t => {
+  TEACHERS.forEach((t) => {
     const opt = document.createElement("option");
     opt.value = t.id;
     opt.textContent = t.name;
@@ -319,6 +332,7 @@ function initApp() {
   if (data.id) {
     const idEl = document.getElementById("id");
     idEl.value = data.id;
+
     // ✅ Only lock if we've actually locked it before (after first assessment load)
     if (data.idLocked) {
       idEl.readOnly = true;
@@ -329,21 +343,23 @@ function initApp() {
   }
   if (data.teacher) teacherSel.value = data.teacher;
 
-  // Deadline banner / locking
   setupDeadlineBanner();
 }
 
 // ------------------------------------------------------------
-// Save / load answers  (now per-assessment)
+// Save / load answers (per-assessment)
 // ------------------------------------------------------------
 function saveAnswer(qid) {
   if (!currentAssessmentId) return;
   const field = document.getElementById("q" + qid);
   if (!field) return;
+
   const val = field.value;
+
   if (!data.answers[currentAssessmentId]) {
     data.answers[currentAssessmentId] = {};
   }
+
   data.answers[currentAssessmentId][qid] = xorEncode(val);
   data.lastSaved = new Date().toISOString();
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -351,8 +367,8 @@ function saveAnswer(qid) {
 
 function getAnswer(qid) {
   if (!currentAssessmentId) return "";
-  const enc = data.answers[currentAssessmentId]?.[qid];
-  return xorDecode(enc || "");
+  const encVal = data.answers[currentAssessmentId]?.[qid];
+  return xorDecode(encVal || "");
 }
 
 // ------------------------------------------------------------
@@ -413,12 +429,12 @@ function loadAssessment() {
   }
 
   const ass = ASSESSMENTS[idx];
-  currentAssessmentId = ass.id; // ✅ track which assessment we’re on
+  currentAssessmentId = ass.id;
 
   const questionsDiv = document.getElementById("questions");
   questionsDiv.innerHTML = "";
 
-  ass.questions.forEach(q => {
+  ass.questions.forEach((q) => {
     const wrap = document.createElement("div");
     wrap.className = "question";
     wrap.id = "q-" + q.id.toLowerCase();
@@ -428,7 +444,6 @@ function loadAssessment() {
 
     const markSpan = document.createElement("span");
 
-    // Clean display ID: "q5" -> "Q5", others -> uppercased
     let displayId;
     const simpleMatch = q.id.match(/^q(\d+)$/i);
     if (simpleMatch) displayId = "Q" + simpleMatch[1];
@@ -438,9 +453,12 @@ function loadAssessment() {
     header.appendChild(markSpan);
 
     const typeSpan = document.createElement("span");
-    typeSpan.textContent = q.type === "mc" ? "Multi-choice" :
-                            q.type === "short" ? "Short answer" :
-                            "Extended answer";
+    typeSpan.textContent =
+      q.type === "mc"
+        ? "Multi-choice"
+        : q.type === "short"
+        ? "Short answer"
+        : "Extended answer";
     header.appendChild(typeSpan);
 
     wrap.appendChild(header);
@@ -449,29 +467,27 @@ function loadAssessment() {
     p.innerHTML = q.text;
     wrap.appendChild(p);
 
-if (q.image) {
-  const img = document.createElement("img");
-  img.alt = "Question image";
-  img.loading = "lazy"; // optional
+    if (q.image) {
+      const img = document.createElement("img");
+      img.alt = "Question image";
+      img.loading = "lazy";
 
-  img.onerror = function () {
-    // prevent infinite loop if blank.jpg is also missing
-    if (!this.dataset.fallbackTried) {
-      this.dataset.fallbackTried = "1";
-      this.src = "blank.jpg"; // or "images/blank.jpg" if it's in a folder
-    } else {
-      // last resort: hide the broken image icon
-      this.style.display = "none";
+      img.onerror = function () {
+        if (!this.dataset.fallbackTried) {
+          this.dataset.fallbackTried = "1";
+          this.src = "blank.jpg";
+        } else {
+          this.style.display = "none";
+        }
+      };
+
+      img.src = q.image;
+      wrap.appendChild(img);
     }
-  };
-
-  img.src = q.image;
-  wrap.appendChild(img);
-}
-
 
     let field;
     const fieldId = "q" + q.id;
+
     if (q.type === "mc") {
       field = document.createElement("select");
       field.id = fieldId;
@@ -480,7 +496,7 @@ if (q.image) {
       blankOpt.value = "";
       blankOpt.textContent = "Select an answer";
       field.appendChild(blankOpt);
-      (q.options || []).forEach(opt => {
+      (q.options || []).forEach((opt) => {
         const o = document.createElement("option");
         o.value = opt;
         o.textContent = opt;
@@ -519,7 +535,7 @@ function gradeIt() {
   let total = 0;
   let totalPoints = 0;
 
-  const results = ass.questions.map(q => {
+  const results = ass.questions.map((q) => {
     const field = document.getElementById("q" + q.id);
     const ans = (field?.value || "").trim();
     saveAnswer(q.id);
@@ -527,7 +543,7 @@ function gradeIt() {
     let earned = 0;
     let bestHint = q.hint || "";
 
-    (q.rubric || []).forEach(rule => {
+    (q.rubric || []).forEach((rule) => {
       if (rule.check.test(ans)) {
         if (q.maxPoints === 1) earned = Math.max(earned, Math.min(rule.points, q.maxPoints));
         else earned += rule.points;
@@ -546,7 +562,7 @@ function gradeIt() {
       max: q.maxPoints,
       answer: ans,
       text: q.text,
-      hint: bestHint
+      hint: bestHint,
     };
   });
 
@@ -557,18 +573,14 @@ function gradeIt() {
 // Colour question cards + show hints UNDER questions only
 // ------------------------------------------------------------
 function colourQuestions(results) {
-  results.forEach(r => {
+  results.forEach((r) => {
     const qid = r.id.toLowerCase();
     const box = document.getElementById("q-" + qid);
     if (!box) return;
 
     box.classList.remove("correct", "partial", "wrong");
 
-    const status =
-      r.earned === r.max ? "correct" :
-      r.earned > 0       ? "partial" :
-                           "wrong";
-
+    const status = r.earned === r.max ? "correct" : r.earned > 0 ? "partial" : "wrong";
     box.classList.add(status);
 
     const hintClass = "hint-inline";
@@ -588,7 +600,6 @@ function colourQuestions(results) {
   });
 }
 
-
 function enablePdfMode() {
   const result = document.getElementById("result");
   if (result) result.classList.add("pdf-mode");
@@ -598,6 +609,207 @@ function disablePdfMode() {
   const result = document.getElementById("result");
   if (result) result.classList.remove("pdf-mode");
 }
+
+// ------------------------------------------------------------
+// Encrypted progress save/load (ADDED)
+// Ctrl+S = save progress (.puk)
+// Ctrl+L = load progress (.puk) ONLY if student ID matches
+// ------------------------------------------------------------
+const __te = new TextEncoder();
+const __td = new TextDecoder();
+
+const __b64 = {
+  fromBytes: (bytes) => btoa(String.fromCharCode(...bytes)),
+  toBytes: (b64str) => Uint8Array.from(atob(b64str), (c) => c.charCodeAt(0)),
+};
+
+async function __deriveAesKeyFromPassword(password, saltBytes, iterations = 150000) {
+  const baseKey = await crypto.subtle.importKey("raw", __te.encode(password), "PBKDF2", false, [
+    "deriveKey",
+  ]);
+
+  return crypto.subtle.deriveKey(
+    { name: "PBKDF2", salt: saltBytes, iterations, hash: "SHA-256" },
+    baseKey,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt", "decrypt"]
+  );
+}
+
+async function __encryptWithStudentId(obj, studentId) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await __deriveAesKeyFromPassword(studentId, salt);
+
+  const plaintext = __te.encode(JSON.stringify(obj));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, plaintext));
+
+  return {
+    format: "PHS_SID_ENC_V1",
+    savedAt: new Date().toISOString(),
+    studentId: studentId, // used for match check (not secret)
+    salt: __b64.fromBytes(salt),
+    iv: __b64.fromBytes(iv),
+    ct: __b64.fromBytes(ct),
+  };
+}
+
+async function __decryptWithStudentId(payload, studentId) {
+  if (!payload || payload.format !== "PHS_SID_ENC_V1") throw new Error("Not a valid progress file.");
+
+  const salt = __b64.toBytes(payload.salt);
+  const iv = __b64.toBytes(payload.iv);
+  const ct = __b64.toBytes(payload.ct);
+  const key = await __deriveAesKeyFromPassword(studentId, salt);
+
+  let pt;
+  try {
+    pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct);
+  } catch {
+    throw new Error("Cannot decrypt (wrong ID or corrupted file).");
+  }
+
+  return JSON.parse(__td.decode(new Uint8Array(pt)));
+}
+
+function __safeFilePart(s) {
+  return (s || "").trim().replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_\-]/g, "");
+}
+
+function __getCurrentStudentId() {
+  return (data.id || document.getElementById("id")?.value || "").trim();
+}
+
+let __progressFileInput = null;
+
+function __ensureProgressFileInput() {
+  if (__progressFileInput) return __progressFileInput;
+
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = ".puk,application/json,.json";
+  inp.style.display = "none";
+
+  (document.body || document.documentElement).appendChild(inp);
+
+  inp.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    await loadProgressEncryptedFile(file);
+  });
+
+  __progressFileInput = inp;
+  return __progressFileInput;
+}
+
+async function saveProgressEncrypted() {
+  const studentId = __getCurrentStudentId();
+  if (!studentId) return showToast("Enter Student ID first.", false);
+
+  // Ensure latest info is stored
+  saveStudentInfo();
+
+  // Ensure latest answers are persisted
+  if (currentAssessmentId) {
+    const idx = document.getElementById("assessmentSelector")?.value;
+    const ass = ASSESSMENTS?.[idx];
+    (ass?.questions || []).forEach((q) => saveAnswer(q.id));
+  }
+
+  const payload = await __encryptWithStudentId(data, studentId);
+
+  const filename = `${__safeFilePart(studentId)}_${__safeFilePart(APP_TITLE || "assessment")}.puk`;
+  const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  showToast("Progress saved (encrypted).");
+}
+
+async function loadProgressEncryptedFile(file) {
+  if (!file) return;
+
+  const studentId = __getCurrentStudentId();
+  if (!studentId) return showToast("Enter Student ID first.", false);
+
+  let payload;
+  try {
+    payload = JSON.parse(await file.text());
+  } catch {
+    return showToast("Invalid file.", false);
+  }
+
+  // ✅ Match check BEFORE decrypt
+  const fileId = (payload.studentId || "").trim();
+  if (!fileId || fileId !== studentId) {
+    return showToast("Student ID mismatch — not loaded.", false);
+  }
+
+  let restored;
+  try {
+    restored = await __decryptWithStudentId(payload, studentId);
+  } catch (e) {
+    return showToast(e.message || "Decryption failed.", false);
+  }
+
+  // ✅ Safety: confirm decrypted id too
+  if ((restored.id || "").trim() !== studentId) {
+    return showToast("Decrypted ID mismatch — refusing to load.", false);
+  }
+
+  data = restored;
+
+  // IMPORTANT: STORAGE_KEY must already be initialised by loadQuestions()
+  if (!STORAGE_KEY) {
+    // Still restore UI so teacher can see it, but warn.
+    if (DEBUG) console.warn("STORAGE_KEY not set yet; loadQuestions may not have run.");
+  } else {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+
+  // Restore UI
+  if (data.name) document.getElementById("name").value = data.name;
+  if (data.id) document.getElementById("id").value = data.id;
+  if (data.teacher) document.getElementById("teacher").value = data.teacher;
+
+  // Re-apply lock
+  const idEl = document.getElementById("id");
+  if (data.idLocked) {
+    idEl.readOnly = true;
+    idEl.classList.add("locked-field");
+    document.getElementById("locked-msg").classList.remove("hidden");
+    document.getElementById("locked-id").textContent = data.id;
+  }
+
+  // Reload the assessment UI (uses restored answers)
+  loadAssessment();
+  showToast("Progress loaded (encrypted).");
+}
+
+// Keyboard shortcuts
+document.addEventListener("keydown", (e) => {
+  const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
+  const mod = isMac ? e.metaKey : e.ctrlKey;
+  if (!mod) return;
+
+  const k = (e.key || "").toLowerCase();
+
+  if (k === "s") {
+    e.preventDefault();
+    saveProgressEncrypted();
+  }
+
+  if (k === "l") {
+    e.preventDefault();
+    __ensureProgressFileInput().click();
+  }
+});
 
 // ------------------------------------------------------------
 // Deadline helpers
@@ -625,11 +837,10 @@ function getDeadlineStatus(now = new Date()) {
   }
 }
 
-// Lock fields once deadline passed
 function lockAllFieldsForDeadline() {
   const questionsDiv = document.getElementById("questions");
   if (questionsDiv) {
-    questionsDiv.querySelectorAll("input, textarea, select").forEach(el => {
+    questionsDiv.querySelectorAll("input, textarea, select").forEach((el) => {
       el.readOnly = true;
       if (el.tagName === "SELECT") el.disabled = true;
       el.classList.add("locked-field");
@@ -642,14 +853,14 @@ function lockAllFieldsForDeadline() {
   const assSel = document.getElementById("assessmentSelector");
   const emailBtn = document.getElementById("emailBtn");
 
-  [nameEl, idEl].forEach(el => {
+  [nameEl, idEl].forEach((el) => {
     if (el) {
       el.readOnly = true;
       el.classList.add("locked-field");
     }
   });
 
-  [teacherEl, assSel].forEach(el => {
+  [teacherEl, assSel].forEach((el) => {
     if (el) el.disabled = true;
   });
 
@@ -687,12 +898,13 @@ function setupDeadlineBanner() {
 
   let cls = "info";
   let text = "";
+
   const { status: st, label, dateStr, daysLeft, overdueDays } = {
     status: deadlineStatus.status,
     label: deadlineStatus.label,
     dateStr: deadlineStatus.dateStr,
     daysLeft: deadlineStatus.daysLeft ?? null,
-    overdueDays: deadlineStatus.overdueDays ?? null
+    overdueDays: deadlineStatus.overdueDays ?? null,
   };
 
   if (st === "upcoming") {
@@ -748,7 +960,7 @@ function submitWork() {
   colourQuestions(results);
 
   const studentName = document.getElementById("name").value.trim();
-  const teacherName = TEACHERS.find(t => t.id === teacherSel.value)?.name || "";
+  const teacherName = TEACHERS.find((t) => t.id === teacherSel.value)?.name || "";
 
   document.getElementById("student").textContent = studentName;
   document.getElementById("teacher-name").textContent = teacherName;
@@ -757,69 +969,55 @@ function submitWork() {
   const answersDiv = document.getElementById("answers");
   answersDiv.innerHTML = "";
 
- results.forEach(r => {
-  const fb = document.createElement("div");
+  results.forEach((r) => {
+    const fb = document.createElement("div");
 
-  const status =
-    r.earned === r.max ? "correct" :
-    r.earned > 0       ? "partial" :
-                         "wrong";
+    const status = r.earned === r.max ? "correct" : r.earned > 0 ? "partial" : "wrong";
+    fb.className = `feedback ${status}`;
 
-  fb.className = `feedback ${status}`;
+    const h3 = document.createElement("h3");
+    h3.innerHTML = `${r.id}: ${r.text}`;
+    fb.appendChild(h3);
 
-  // --- Title (question text may contain HTML from your JSON, keep as-is if you want formatting)
-  const h3 = document.createElement("h3");
-  h3.innerHTML = `${r.id}: ${r.text}`;  // r.text comes from your JSON, not the student
-  fb.appendChild(h3);
+    const pAns = document.createElement("p");
+    const strongAns = document.createElement("strong");
+    strongAns.textContent = "Your answer: ";
+    pAns.appendChild(strongAns);
 
-  // --- Student answer (MUST be textContent to prevent XSS)
-  const pAns = document.createElement("p");
-  const strongAns = document.createElement("strong");
-  strongAns.textContent = "Your answer: ";
-  pAns.appendChild(strongAns);
+    const ansSpan = document.createElement("span");
+    ansSpan.textContent = r.answer ? r.answer : "No answer provided";
+    pAns.appendChild(ansSpan);
+    fb.appendChild(pAns);
 
-  const ansSpan = document.createElement("span");
-  ansSpan.textContent = r.answer ? r.answer : "No answer provided";
-  pAns.appendChild(ansSpan);
+    const pRes = document.createElement("p");
+    const strongRes = document.createElement("strong");
+    strongRes.textContent = "Result: ";
+    pRes.appendChild(strongRes);
 
-  fb.appendChild(pAns);
+    const statusText = status === "correct" ? "Correct" : status === "partial" ? "Partially correct" : "Incorrect";
 
-  // --- Result line
-  const pRes = document.createElement("p");
-  const strongRes = document.createElement("strong");
-  strongRes.textContent = "Result: ";
-  pRes.appendChild(strongRes);
+    const resSpan = document.createElement("span");
+    resSpan.textContent = `${statusText} (${r.earned}/${r.max} marks)`;
+    pRes.appendChild(resSpan);
 
-  const statusText =
-    status === "correct" ? "Correct" :
-    status === "partial" ? "Partially correct" :
-                           "Incorrect";
-
-  const resSpan = document.createElement("span");
-  resSpan.textContent = `${statusText} (${r.earned}/${r.max} marks)`;
-  pRes.appendChild(resSpan);
-
-  fb.appendChild(pRes);
-
-  answersDiv.appendChild(fb);
-});
-
+    fb.appendChild(pRes);
+    answersDiv.appendChild(fb);
+  });
 
   const deadlineNow = getDeadlineStatus(new Date());
 
- finalData = {
-  studentName,
-  studentId: document.getElementById("id").value.trim(),
-  teacherName,
-  assessmentTitle: ASSESSMENTS[assSel.value].title,
-  assessmentSubtitle: ASSESSMENTS[assSel.value].subtitle || "",
-  attachSignoff: !!ASSESSMENTS[assSel.value].attachSignoff,
-  points: total,
-  totalPoints,
-  pct,
-  deadlineInfo: deadlineNow
-};
-
+  finalData = {
+    studentName,
+    studentId: document.getElementById("id").value.trim(),
+    teacherName,
+    assessmentTitle: ASSESSMENTS[assSel.value].title,
+    assessmentSubtitle: ASSESSMENTS[assSel.value].subtitle || "",
+    attachSignoff: !!ASSESSMENTS[assSel.value].attachSignoff,
+    points: total,
+    totalPoints,
+    pct,
+    deadlineInfo: deadlineNow,
+  };
 
   const emailBtn = document.getElementById("emailBtn");
   if (pct >= MIN_PCT_FOR_SUBMIT && (!deadlineNow || deadlineNow.status !== "overdue")) {
@@ -844,15 +1042,8 @@ function back() {
 }
 
 // ------------------------------------------------------------
-// Email / PDF – streamlined header: ONLY deadline-relative submission line
-// + filename StudentNo_StudentName_AssessmentTitle.pdf
+// Email / PDF (existing behaviour preserved)
 // ------------------------------------------------------------
-
-
-
-
-
-
 async function emailWork() {
   if (!finalData) return alert("Submit first!");
 
@@ -865,18 +1056,16 @@ async function emailWork() {
     return alert("The submission deadline has passed – emailing is now disabled until next year.");
   }
 
-  const safePart = s =>
+  const safePart = (s) =>
     (s || "")
       .trim()
       .replace(/\s+/g, "_")
       .replace(/[^a-zA-Z0-9_\-]/g, "");
 
-
- if (!(window.jspdf && window.html2canvas)) {
-  await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
-  await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
-}
-
+  if (!(window.jspdf && window.html2canvas)) {
+    await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    await loadScriptOnce("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+  }
 
   if (!window.jspdf || !window.html2canvas) {
     alert("PDF libraries failed to load. Please check your internet connection.");
@@ -889,7 +1078,6 @@ async function emailWork() {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
 
-  // Crest once
   const crestImg = document.querySelector("header img.crest");
   let crestDataUrl = null;
 
@@ -914,7 +1102,6 @@ async function emailWork() {
   }
 
   const drawHeader = (isFirstPage = false) => {
-    // Maroon bar
     pdf.setFillColor(110, 24, 24);
     pdf.rect(0, 0, pageWidth, 30, "F");
 
@@ -939,8 +1126,6 @@ async function emailWork() {
       if (finalData.assessmentSubtitle) pdf.text(`Part: ${finalData.assessmentSubtitle}`, 10, y + 22);
       pdf.text(`Score: ${finalData.points}/${finalData.totalPoints} (${finalData.pct}%)`, 10, y + 29);
 
-      // ✅ Only the one submission line you want:
-      // "Submitted early: 2 days before deadline (12/24/2025)."
       const infoY = y + 38;
       const info = finalData.deadlineInfo;
 
@@ -975,11 +1160,9 @@ async function emailWork() {
     }
   };
 
-  // IMPORTANT: marginTop must be BELOW the header text,
-  // otherwise the html2canvas images cover the header lines.
   const marginLeft = 10;
   const marginRight = 10;
-  const marginTop = 80;     // ✅ prevents overlap (was 70)
+  const marginTop = 80;
   const marginBottom = 10;
   const usableHeight = pageHeight - marginTop - marginBottom;
 
@@ -991,61 +1174,55 @@ async function emailWork() {
   const resultHeader = resultSection.querySelector(".result-header");
   if (resultHeader) blocks.push(resultHeader);
 
-  resultSection.querySelectorAll(".feedback").forEach(el => blocks.push(el));
-
+  resultSection.querySelectorAll(".feedback").forEach((el) => blocks.push(el));
   if (blocks.length === 0) blocks.push(resultSection);
 
   drawHeader(true);
   let currentY = marginTop;
 
-enablePdfMode();
-await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  enablePdfMode();
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-try {
-  for (const block of blocks) {
-    const canvas = await window.html2canvas(block, {
-      scale: 1.5,
-      width: TARGET_WIDTH,
-      windowWidth: TARGET_WIDTH,
-      useCORS: true,
-      scrollX: 0,
-      scrollY: -window.scrollY
-    });
+  try {
+    for (const block of blocks) {
+      const canvas = await window.html2canvas(block, {
+        scale: 1.5,
+        width: TARGET_WIDTH,
+        windowWidth: TARGET_WIDTH,
+        useCORS: true,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+      });
 
-  
+      const imgData = canvas.toDataURL("image/jpeg", 0.8);
+      const imgProps = pdf.getImageProperties(imgData);
 
-    const imgData = canvas.toDataURL("image/jpeg", 0.8);
-    const imgProps = pdf.getImageProperties(imgData);
+      const maxContentWidth = pageWidth - marginLeft - marginRight;
+      let imgWidth = maxContentWidth;
+      let imgHeight = (imgProps.height * imgWidth) / imgProps.width;
 
-    const maxContentWidth = pageWidth - marginLeft - marginRight;
-    let imgWidth = maxContentWidth;
-    let imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+      const maxBlockHeight = usableHeight * 0.9;
+      if (imgHeight > maxBlockHeight) {
+        const scale = maxBlockHeight / imgHeight;
+        imgWidth *= scale;
+        imgHeight = maxBlockHeight;
+      }
 
-    const maxBlockHeight = usableHeight * 0.9;
-    if (imgHeight > maxBlockHeight) {
-      const scale = maxBlockHeight / imgHeight;
-      imgWidth *= scale;
-      imgHeight = maxBlockHeight;
+      const xPos = (pageWidth - imgWidth) / 2;
+
+      if (currentY + imgHeight > pageHeight - marginBottom) {
+        pdf.addPage();
+        drawHeader(false);
+        currentY = marginTop;
+      }
+
+      pdf.addImage(imgData, "JPEG", xPos, currentY, imgWidth, imgHeight);
+      currentY += imgHeight + 5;
     }
-
-    const xPos = (pageWidth - imgWidth) / 2;
-
-    if (currentY + imgHeight > pageHeight - marginBottom) {
-      pdf.addPage();
-      drawHeader(false);
-      currentY = marginTop;
-    }
-
-    pdf.addImage(imgData, "JPEG", xPos, currentY, imgWidth, imgHeight);
-    currentY += imgHeight + 5;
+  } finally {
+    disablePdfMode();
   }
 
-      
-} finally {
-  disablePdfMode();
-}
-
-  // Page numbers
   const pageCount = pdf.getNumberOfPages();
   pdf.setFontSize(9);
   pdf.setTextColor(120, 130, 140);
@@ -1054,24 +1231,21 @@ try {
     pdf.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 6, { align: "center" });
   }
 
-let pdfBlob = pdf.output("blob");
+  let pdfBlob = pdf.output("blob");
 
-// ✅ Fill + append sign-off sheet as last page(s)
-// ✅ Fill + append sign-off sheet ONLY if assessment title contains the word "final"
-if (finalData.attachSignoff) {
-  try {
-    const signoffBytes = await fetchOptionalPdfBytes("assessment.pdf");
-
-    if (signoffBytes) {
-      const filledBytes = await fillPdfForm(signoffBytes, finalData);
-      pdfBlob = await appendPdfBytesToBlob(pdfBlob, filledBytes);
+  // Attach signoff sheet if flagged
+  if (finalData.attachSignoff) {
+    try {
+      const signoffBytes = await fetchOptionalPdfBytes("assessment.pdf");
+      if (signoffBytes) {
+        const filledBytes = await fillPdfForm(signoffBytes, finalData);
+        pdfBlob = await appendPdfBytesToBlob(pdfBlob, filledBytes);
+      }
+    } catch (e) {
+      console.warn("Sign-off sheet fill/append failed, continuing without it:", e);
     }
-  } catch (e) {
-    console.warn("Sign-off sheet fill/append failed, continuing without it:", e);
   }
-}
 
-  
   const fileName =
     `${safePart(finalData.studentId || "student")}_` +
     `${safePart(finalData.studentName || "name")}_` +
@@ -1087,7 +1261,7 @@ if (finalData.attachSignoff) {
       await navigator.share({
         title: "Assessment PDF",
         text: "Here is my completed assessment.",
-        files: [pdfFile]
+        files: [pdfFile],
       });
       showToast("Shared via device share sheet.");
       return;
@@ -1104,8 +1278,6 @@ if (finalData.attachSignoff) {
   URL.revokeObjectURL(url);
 }
 
-  
-
 // ------------------------------------------------------------
 // Simple clipboard clear (best-effort)
 // ------------------------------------------------------------
@@ -1119,14 +1291,18 @@ function clearClipboard() {
 // Attach protection to inputs (softened anti-cheat)
 // ------------------------------------------------------------
 function attachProtection() {
-  document.querySelectorAll(".answer-field").forEach(f => {
+  document.querySelectorAll(".answer-field").forEach((f) => {
     f.addEventListener("input", () => saveAnswer(f.id.slice(1)));
-    f.addEventListener("paste", e => { e.preventDefault(); showToast(PASTE_BLOCKED_MESSAGE, false); clearClipboard(); });
+    f.addEventListener("paste", (e) => {
+      e.preventDefault();
+      showToast(PASTE_BLOCKED_MESSAGE, false);
+      clearClipboard();
+    });
   });
 }
 
 // Limit context menu blocking to the question area only (still allow on inputs)
-document.addEventListener("contextmenu", e => {
+document.addEventListener("contextmenu", (e) => {
   const inQuestionsArea = e.target.closest("#questions");
   if (inQuestionsArea && !e.target.matches("input, textarea")) {
     e.preventDefault();
@@ -1136,10 +1312,10 @@ document.addEventListener("contextmenu", e => {
 // ------------------------------------------------------------
 // Service worker registration for offline/PWA
 // ------------------------------------------------------------
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => {
-      if (DEBUG) console.log('Service worker registration failed:', err);
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch((err) => {
+      if (DEBUG) console.log("Service worker registration failed:", err);
     });
   });
 }
