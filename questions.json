@@ -432,7 +432,13 @@
           "hint": "Look under Polythene in the Plastics section – what sheet is used as a DPM under concrete? (Page 22)",
           "type": "short",
           "maxPoints": 1,
-         "check": "polyth.?ene|polyethylene|poly\\s*sheet|plastic\\s*sheet|DPM|damp.?proof.?membrane|vapou?r\\s*barrier|black\\s*plastic|200.?micron|250.?micron"
+         "checks": [
+    {
+      "points": 1,
+      "check": "polyth.?ene|polyethylene|poly\\s*sheet|plastic\\s*sheet|DPM|damp.?proof.?membrane|vapou?r\\s*barrier|black\\s*plastic|200.?micron|250.?micron",
+      "flags": "i"
+    }
+  ]
         },
         {
           "id": "q11",
