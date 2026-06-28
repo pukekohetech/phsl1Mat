@@ -68,6 +68,11 @@
               "check": "kauri",
               "flags": "i"
             },
+             {
+              "points": 1,
+              "check": "totara",
+              "flags": "i"
+            },
             {
               "points": 1,
               "check": "matai",
