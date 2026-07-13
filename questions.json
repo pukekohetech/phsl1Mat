@@ -695,82 +695,27 @@
           "type": "long",
           "maxPoints": 4,
           "rubric": [
-            {
-              "points": 1,
-              "check": "light colour|pale|creamy|yellowish|blonde|light brown|softwood look",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "knot|knots|knotty|many knots|visible knots|clear grade|fewer knots",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "grain|straight grain|visible grain|softwood grain|pinus|radiata pattern",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "soft|softwood|easy to dent|dents? easily|softer than hardwood",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "easy to work|easy workability|works? well|cuts? easily|saws? well|planes? well|good workability",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "nail|screw|glues? well|holds? nails?|holds? screws?|good holding|takes? fixings?",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "splinter|can splinter|splinters?|rough if torn|needs sanding|tear ?out",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "light ?weight|lightweight|low density|easy to lift|easy to handle|floats",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "strong enough|reasonable strength|good strength.*length|structural grade|construction timber",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "bends?|flexible|springy|deflects?|not rigid|low stiffness|low modulus",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "warp|twist|cup|bow|movement|shrink|expand|seasoned|kiln ?dried|dry|moisture content",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "stable if dry|dimensionally? stable when seasoned|less movement if kiln ?dried",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "treated|untreated|H1|H2|LOS P|boric|tan ?e|green tint|blue tint",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "paint|takes? paint|good for painting|painted finish|primed|undercoat",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "cheap|inexpensive|affordable|low cost|budget timber|plantation grown",
-              "flags": "i"
-            }
-          ]
+    {
+      "points": 1,
+      "check": "light[- ]?(colou?r|brown|yellow)|pale|creamy|yellowish|blonde|light brown|softwood look|knot|knots|knotty|grain|straight grain|visible grain|softwood grain|radiata pattern",
+      "flags": "i"
+    },
+    {
+      "points": 1,
+      "check": "easy to work|easy workability|easy to use|pretty easy to work with|works? well|cuts? easily|easy to cut|saws? well|planes? well|good workability|easy to shape|easy to sand|easy to handle|nail|screw|glues? well|takes? fixings?",
+      "flags": "i"
+    },
+    {
+      "points": 1,
+      "check": "strong|mostly strong|strong enough|reasonable strength|good strength|fairly strong|moderate strength|sufficient strength|structural grade|construction timber|supports? weight|holds? weight|durable enough",
+      "flags": "i"
+    },
+    {
+      "points": 1,
+      "check": "structural.*stabl|structurally stable|stable if dry|stable when dry|dimensionally? stable|warp|warps|may warp|twist|cup|bow|movement|shrink|expand|swells?|moisture|gets? wet|when wet|if wet|seasoned|kiln[- ]?dried|less movement.*dry",
+      "flags": "i"
+    }
+  ]
         },
         {
           "id": "mat1_q3",
