@@ -7,7 +7,7 @@
     <title id="page-title">Loading…</title>
     <!-- Add a favicon for better browser tab appearance -->
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=12">
 
   </head>
   <body>
@@ -90,7 +90,166 @@
       </section>
     </div>
 
-    <!-- Load the application logic. Using a regular script tag avoids issues with ES module loading via the file:// protocol. -->
-    <script src="script.js?v=10" defer></script>
+    <!-- Reading comfort controls. These are kept separate from assessment logic. -->
+    <button id="readingComfortToggle" class="reading-comfort-toggle" type="button" aria-controls="readingComfortPanel" aria-expanded="false">
+      <span aria-hidden="true">Aa</span>
+      <span>Reading comfort</span>
+    </button>
+
+    <button id="readingComfortRemove" class="reading-comfort-remove hidden" type="button">
+      Remove reading changes
+    </button>
+
+    <div id="readingTint" class="reading-tint" aria-hidden="true"></div>
+
+    <div id="readingRuler" class="reading-ruler hidden" aria-hidden="true">
+      <div id="readingRulerHandle" class="reading-ruler-handle" title="Drag to move reading ruler" aria-hidden="true">↕</div>
+    </div>
+
+    <aside id="readingComfortPanel" class="reading-comfort-panel hidden" aria-labelledby="readingComfortTitle">
+      <div class="reading-comfort-panel__header">
+        <div>
+          <p class="reading-comfort-kicker">Accessibility tools</p>
+          <h2 id="readingComfortTitle">Reading Comfort</h2>
+        </div>
+        <button id="readingComfortClose" class="reading-icon-button" type="button" aria-label="Close reading comfort settings">×</button>
+      </div>
+
+      <div class="reading-preview" aria-label="Reading comfort sample passage">
+        <strong>Try these settings</strong>
+        <p>Adjust the page until this short passage feels calm, clear and comfortable to read. There is no single setting that is best for everyone.</p>
+      </div>
+
+      <section class="reading-control-section" aria-labelledby="readingColourHeading">
+        <div class="reading-section-heading">
+          <h3 id="readingColourHeading">Choose a screen colour</h3>
+          <output id="readingColourName">Cream</output>
+        </div>
+        <div id="readingColourPresets" class="reading-colour-grid" role="group" aria-label="Screen colour presets">
+          <button type="button" class="reading-colour-chip" data-colour="#fff4d6" data-name="Cream" aria-label="Cream screen colour"><span style="--chip-colour:#fff4d6"></span>Cream</button>
+          <button type="button" class="reading-colour-chip" data-colour="#fff3a8" data-name="Yellow" aria-label="Pale yellow screen colour"><span style="--chip-colour:#fff3a8"></span>Yellow</button>
+          <button type="button" class="reading-colour-chip" data-colour="#ffd7bd" data-name="Peach" aria-label="Peach screen colour"><span style="--chip-colour:#ffd7bd"></span>Peach</button>
+          <button type="button" class="reading-colour-chip" data-colour="#ffd6e2" data-name="Pink" aria-label="Pink screen colour"><span style="--chip-colour:#ffd6e2"></span>Pink</button>
+          <button type="button" class="reading-colour-chip" data-colour="#dcefcf" data-name="Green" aria-label="Pale green screen colour"><span style="--chip-colour:#dcefcf"></span>Green</button>
+          <button type="button" class="reading-colour-chip" data-colour="#cceff1" data-name="Aqua" aria-label="Aqua screen colour"><span style="--chip-colour:#cceff1"></span>Aqua</button>
+          <button type="button" class="reading-colour-chip" data-colour="#d8e8ff" data-name="Blue" aria-label="Pale blue screen colour"><span style="--chip-colour:#d8e8ff"></span>Blue</button>
+          <button type="button" class="reading-colour-chip" data-colour="#e4e7eb" data-name="Grey" aria-label="Grey screen colour"><span style="--chip-colour:#e4e7eb"></span>Grey</button>
+          <button type="button" class="reading-colour-chip" data-colour="#e8dcf8" data-name="Lavender" aria-label="Lavender screen colour"><span style="--chip-colour:#e8dcf8"></span>Lavender</button>
+          <label class="reading-colour-chip reading-custom-colour">
+            <input id="readingCustomColour" type="color" value="#fff4d6" aria-label="Choose a custom screen colour">
+            <span class="reading-custom-swatch" aria-hidden="true">+</span>Custom
+          </label>
+        </div>
+
+        <label class="reading-range-row" for="readingFilterStrength">
+          <span>Filter strength</span>
+          <input id="readingFilterStrength" type="range" min="0" max="80" step="5" value="25">
+          <output id="readingFilterStrengthValue">25%</output>
+        </label>
+      </section>
+
+      <section class="reading-control-section" aria-labelledby="readingTextHeading">
+        <h3 id="readingTextHeading">Text</h3>
+        <label for="readingFont">Font</label>
+        <select id="readingFont">
+          <option value="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif">Standard</option>
+          <option value="Arial, Helvetica, sans-serif">Arial</option>
+          <option value="Verdana, Geneva, sans-serif">Verdana</option>
+          <option value="Tahoma, Geneva, sans-serif">Tahoma</option>
+          <option value="Trebuchet MS, Arial, sans-serif">Trebuchet</option>
+          <option value="Georgia, Times New Roman, serif">Georgia</option>
+        </select>
+
+        <div class="reading-step-grid">
+          <div>
+            <span class="reading-control-label">Text size</span>
+            <div class="reading-stepper">
+              <button id="readingTextSmaller" type="button" aria-label="Make text smaller">A−</button>
+              <output id="readingTextSizeValue">100%</output>
+              <button id="readingTextLarger" type="button" aria-label="Make text larger">A+</button>
+            </div>
+          </div>
+          <div>
+            <span class="reading-control-label">Line spacing</span>
+            <div class="reading-stepper">
+              <button id="readingLineTighter" type="button" aria-label="Reduce line spacing">−</button>
+              <output id="readingLineSpacingValue">1.60</output>
+              <button id="readingLineWider" type="button" aria-label="Increase line spacing">+</button>
+            </div>
+          </div>
+        </div>
+
+        <label class="reading-range-row" for="readingLetterSpacing">
+          <span>Letter spacing</span>
+          <input id="readingLetterSpacing" type="range" min="0" max="8" step="1" value="0">
+          <output id="readingLetterSpacingValue">0 px</output>
+        </label>
+      </section>
+
+      <section class="reading-control-section" aria-labelledby="readingDisplayHeading">
+        <h3 id="readingDisplayHeading">Display</h3>
+        <label class="reading-range-row" for="readingBrightness">
+          <span>Brightness</span>
+          <input id="readingBrightness" type="range" min="70" max="120" step="5" value="100">
+          <output id="readingBrightnessValue">100%</output>
+        </label>
+        <label class="reading-range-row" for="readingContrast">
+          <span>Contrast</span>
+          <input id="readingContrast" type="range" min="70" max="130" step="5" value="100">
+          <output id="readingContrastValue">100%</output>
+        </label>
+        <div class="reading-toggle-grid">
+          <label class="reading-switch-row"><input id="readingDarkMode" type="checkbox"><span>Dark mode</span></label>
+          <label class="reading-switch-row"><input id="readingReducedGlare" type="checkbox"><span>Reduced glare</span></label>
+        </div>
+      </section>
+
+      <section class="reading-control-section" aria-labelledby="readingRulerHeading">
+        <div class="reading-section-heading">
+          <h3 id="readingRulerHeading">Reading ruler</h3>
+          <label class="reading-switch-row reading-switch-row--compact"><input id="readingRulerEnabled" type="checkbox"><span>On</span></label>
+        </div>
+        <div class="reading-ruler-controls">
+          <label for="readingRulerLines">Highlighted lines</label>
+          <select id="readingRulerLines">
+            <option value="1">1 line</option>
+            <option value="2">2 lines</option>
+            <option value="3">3 lines</option>
+            <option value="4">4 lines</option>
+            <option value="5">5 lines</option>
+          </select>
+          <div class="reading-ruler-move-buttons" aria-label="Move reading ruler">
+            <button id="readingRulerUp" type="button">Move up</button>
+            <button id="readingRulerDown" type="button">Move down</button>
+          </div>
+        </div>
+        <p class="reading-help">Drag the ↕ handle at the right edge of the ruler, or use the move buttons.</p>
+      </section>
+
+      <section class="reading-control-section" aria-labelledby="readingProfilesHeading">
+        <h3 id="readingProfilesHeading">Anonymous profiles on this device</h3>
+        <div class="reading-profile-row">
+          <select id="readingProfileSlot" aria-label="Choose a profile slot">
+            <option value="1">Profile 1</option>
+            <option value="2">Profile 2</option>
+            <option value="3">Profile 3</option>
+            <option value="4">Profile 4</option>
+          </select>
+          <button id="readingProfileLoad" type="button">Load</button>
+          <button id="readingProfileSave" type="button">Save</button>
+          <button id="readingProfileDelete" type="button" class="reading-danger-button">Delete</button>
+        </div>
+        <p id="readingProfileStatus" class="reading-help" aria-live="polite">Profiles use numbers only and stay in this browser.</p>
+      </section>
+
+      <div class="reading-comfort-actions">
+        <button id="readingSaveSettings" type="button" class="reading-primary-button">Save my settings</button>
+        <button id="readingResetSettings" type="button" class="reading-reset-button">Remove all reading changes</button>
+      </div>
+    </aside>
+
+    <!-- Load the application logic. Using regular script tags avoids issues with ES module loading via file://. -->
+    <script src="script.js?v=12" defer></script>
+    <script src="reading-comfort.js?v=2" defer></script>
   </body>
 </html>

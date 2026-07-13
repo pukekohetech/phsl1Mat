@@ -601,6 +601,9 @@ function colourQuestions(results) {
 }
 
 function enablePdfMode() {
+  if (window.ReadingComfort?.suspendForOutput) {
+    window.ReadingComfort.suspendForOutput();
+  }
   const result = document.getElementById("result");
   if (result) result.classList.add("pdf-mode");
 }
@@ -608,6 +611,9 @@ function enablePdfMode() {
 function disablePdfMode() {
   const result = document.getElementById("result");
   if (result) result.classList.remove("pdf-mode");
+  if (window.ReadingComfort?.resumeAfterOutput) {
+    window.ReadingComfort.resumeAfterOutput();
+  }
 }
 
 // ------------------------------------------------------------
