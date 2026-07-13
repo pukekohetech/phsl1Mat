@@ -1549,48 +1549,48 @@
           "hint": "Why hand-nail with jolt heads instead of using a brad nailer or screws? Think school workshop, cost, no power tools, neat finish after putty.",
           "type": "long",
           "maxPoints": 8,
-          "rubric": [
-            {
-              "points": 2,
-              "check": "aesthetic|neat|tidy|small hole|punched?.*putty|filled?.*putty|clean finish|flat head.*fill|almost invisible|professional look|head.*countersunk",
-              "flags": "i"
-            },
-            {
-              "points": 2,
-              "check": "ergonomic|easy to (hammer|drive|use)|hand nail|no power tool|light hammer|quick|fast|one hand|simple|no compressor",
-              "flags": "i"
-            },
-            {
-              "points": 2,
-              "check": "cost|cheap|cheapest|inexpensive|low cost|few cents|packet.*cheap|budget|affordable|under.*\\$5",
-              "flags": "i"
-            },
-            {
-              "points": 2,
-              "check": "availab|everywhere|hardware store|Bunnings|classroom|stocked|common|easy to (get|buy|find)|always.*stock",
-              "flags": "i"
-            },
-            {
-              "points": 2,
-              "check": "joint|hold.*thin|fixing.*ply|fixing.*mdf|fixing.*hardboard|good for thin material|large head.*pull|quick joint|temporary fix|light duty",
-              "flags": "i"
-            },
-            {
-              "points": 2,
-              "check": "durab|strong enough|holds?.*well|won't pull through|good shear|lasts?.*indoors|sufficient strength|permanent.*indoors",
-              "flags": "i"
-            },
-            {
-              "points": 2,
-              "check": "safety|safe|no power tool|no compressor|manual|hammer only|low risk|student safe|school safe|no flying nail",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "because|since|as|for this reason|this is why|so that|chosen because|selected because|suitable because|ideal because|good choice because",
-              "flags": "i"
-            }
-          ]
+          "rubric":[
+    {
+      "points": 2,
+      "check": "aesthetic|appearance|neat|tidy|small hole|small head|less visible|almost invisible|professional look|clean finish|smooth finish|finished smoothly|filled and finished|fill.*smooth|surface.*fill|punched?.*putty|filled?.*putty|putty.*finish|head.*fill|flat head.*fill|head.*countersunk",
+      "flags": "i"
+    },
+    {
+      "points": 2,
+      "check": "ergonomic|easy to (hammer|drive|use|install)|simple to (hammer|drive|use|install)|hand nail|hand nailed|no power tool|light hammer|quick|fast|faster|one hand|simple to use|no compressor|easy to handle",
+      "flags": "i"
+    },
+    {
+      "points": 2,
+      "check": "cost|cost[- ]?effective|cheap|cheapest|inexpensive|low cost|few cents|packet.*cheap|budget|affordable|less expensive|good value",
+      "flags": "i"
+    },
+    {
+      "points": 2,
+      "check": "availab|readily available|easy to obtain|easy to source|hardware store|Bunnings|classroom|workshop|stocked|common|easy to (get|buy|find)|always.*stock",
+      "flags": "i"
+    },
+    {
+      "points": 2,
+      "check": "jointing method|attach.*thin|attaching.*thin|fix.*thin|fixing.*ply|fixing.*plywood|fixing.*mdf|fixing.*hardboard|good for thin material|suitable for thin|complement.*glue|work.*with glue|used with glue|hold.*while.*glue|create.*joint|strong.*joint|stable.*joint|quick joint|temporary fix|light duty",
+      "flags": "i"
+    },
+    {
+      "points": 2,
+      "check": "durab|strong|stable|secure|strong enough|holds?.*well|good hold|won.?t pull through|resist.*pull|good shear|lasts?.*indoors|sufficient strength|permanent.*indoors|long lasting",
+      "flags": "i"
+    },
+    {
+      "points": 2,
+      "check": "safety|safe|safer|no power tool|no compressor|manual|hammer only|low risk|student safe|school safe|no flying nail|less risk|reduced risk|without splitting|less likely to split|avoid.*split",
+      "flags": "i"
+    },
+    {
+      "points": 2,
+      "check": "because|since|so that|therefore|which means|this allows|this helps|making it|chosen because|selected because|suitable because|ideal because|good choice because",
+      "flags": "i"
+    }
+  ]
         }
       ]
     }
