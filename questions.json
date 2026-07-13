@@ -1520,87 +1520,27 @@
           "type": "long",
           "maxPoints": 4,
           "rubric": [
-            {
-              "points": 1,
-              "check": "brad|brads|18 ?ga|brad nail|air brad|finish nail",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "panel ?pin|pin|lost head|fine pin|escutcheon",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "staple|narrow crown|18 ?gauge|fine wire|air staple",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "screw|wood screw|chipboard screw|pocket screw|pre.?drill",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "glue| PVA|superglue|hot glue|no nail|adhesive only",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "stronger|higher hold|better shear|less pull.?out|won't come loose",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "weaker|lower hold|pulls?.*out|shears?.*easily|light duty",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "neater|less visible|no head|headless|smaller hole|invisible joint",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "visible head|jolt head|flat head|large head|shows?.*mark|needs putty",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "faster|quicker|rapid|power tool|air nailer|no hammer",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "slower|hammer|manual|hand nail|more time|effort",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "rust|corrode|bright.*rust|not exterior|indoor only",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "stainless|galvani(s|z)ed|won't rust|exterior|weatherproof",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "cheaper|cheapest|low cost|few cents|inexpensive",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "more expensive|dearer|higher cost|brads?.*cost|power tool",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "no power|no tool|hand tool|hammer only|manual",
-              "flags": "i"
-            }
-          ]
+    {
+      "points": 1,
+      "check": "brad|brads|18 ?ga|18 ?gauge|brad nail|air brad|finish nail|panel ?pin|panel pins|pin|lost head|fine pin|escutcheon|staple|staples|narrow crown|fine wire|air staple|screw|screws|wood screw|chipboard screw|pocket screw|glue|PVA|superglue|hot glue|no nails?|adhesive|adhesive only",
+      "flags": "i"
+    },
+    {
+      "points": 1,
+      "check": "stronger|more strongly|stronger hold|higher hold|better hold|greater hold|better shear|more secure|less pull.?out|less likely to pull out|won.?t come loose|weaker|lower hold|less secure|pulls?.*out|shears?.*easily|light duty",
+      "flags": "i"
+    },
+    {
+      "points": 1,
+      "check": "faster|quicker|rapid|more efficient|efficient|slower|takes? longer|more time|time.?consuming|effort|easier to install|harder to install|pre.?drill|drill|screwdriver|hammer|hammer only|manual|hand nail|hand tool|air nailer|nail gun|staple gun|power tool|no power|no tool|no hammer",
+      "flags": "i"
+    },
+    {
+      "points": 1,
+      "check": "neater|tidier|less visible|no head|headless|smaller hole|small hole|invisible joint|visible head|jolt head|flat head|large head|shows?.*mark|leaves?.*mark|needs? putty|needs? filling|cheaper|cheapest|low cost|few cents|inexpensive|more expensive|dearer|higher cost|brads?.*cost|rust|rusts|corrode|corrosion|bright.*rust|not exterior|not suitable for exterior|indoor only|stainless|galvani(s|z)ed|won.?t rust|exterior|weatherproof|split|splitting|less likely to split|more likely to split|suitable|more suitable|better for|appropriate|preferred",
+      "flags": "i"
+    }
+  ]
         },
         {
           "id": "mat4_q4",
