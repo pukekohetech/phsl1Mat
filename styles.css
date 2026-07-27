@@ -1186,6 +1186,256 @@ body.reading-reduced-glare img:not(.crest) {
 }
 
 
+
+
+/* ============================================================
+   ASSESSMENT SETTINGS / SAVE AND LOAD
+   ============================================================ */
+.app-settings-toggle,
+.app-settings-panel,
+.app-settings-panel * {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  letter-spacing: normal;
+}
+
+.app-settings-toggle {
+  position: fixed;
+  bottom: 18px;
+  left: 18px;
+  z-index: 1202;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 52px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  padding: 9px 15px 9px 10px;
+  background: #1f2933;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.28);
+}
+
+.app-settings-toggle:hover,
+.app-settings-toggle:focus-visible {
+  background: #334155;
+  outline: 3px solid rgba(31, 41, 51, 0.25);
+  outline-offset: 2px;
+}
+
+.app-settings-toggle__icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.app-settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1210;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.app-settings-backdrop.hidden,
+.app-settings-panel.hidden {
+  display: none !important;
+}
+
+.app-settings-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 1211;
+  width: min(520px, calc(100vw - 28px));
+  max-height: calc(100dvh - 28px);
+  overflow-y: auto;
+  transform: translate(-50%, -50%);
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 22px;
+  background: #f8fafc;
+  color: #1f2933;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.42);
+}
+
+body.app-settings-open {
+  overflow: hidden;
+}
+
+.app-settings-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.app-settings-panel__header h2 {
+  margin: 0;
+  color: #1f2933;
+  font-size: 1.6rem;
+}
+
+.app-settings-kicker {
+  margin: 0 0 2px;
+  color: var(--phs-maroon);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-settings-close {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #1f2933;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.app-settings-intro,
+.app-settings-note {
+  margin: 0 0 16px;
+  color: #475569;
+}
+
+.app-settings-status {
+  margin-bottom: 16px;
+  border-left: 5px solid #d97706;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #fff7ed;
+  color: #7c2d12;
+  font-weight: 650;
+}
+
+.app-settings-status.ready {
+  border-left-color: #15803d;
+  background: #f0fdf4;
+  color: #14532d;
+}
+
+.app-settings-actions {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.settings-action-button {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 74px;
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 15px;
+  background: var(--phs-maroon);
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(110, 24, 24, 0.25);
+}
+
+.settings-action-button--secondary {
+  background: #334155;
+  box-shadow: 0 8px 18px rgba(51, 65, 85, 0.25);
+}
+
+.settings-action-button:hover,
+.settings-action-button:focus-visible {
+  transform: translateY(-1px);
+  outline: 3px solid rgba(110, 24, 24, 0.2);
+  outline-offset: 2px;
+}
+
+.settings-action-button > span:first-child {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 26px;
+}
+
+.settings-action-button strong,
+.settings-action-button small {
+  display: block;
+}
+
+.settings-action-button strong {
+  font-size: 1rem;
+}
+
+.settings-action-button small {
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.share-help {
+  max-width: 680px;
+  margin: 8px auto 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.result-actions .btn[aria-busy="true"] {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+@media (max-width: 640px) {
+  .app-settings-toggle {
+    bottom: 10px;
+    left: 10px;
+    min-width: 50px;
+    min-height: 50px;
+    padding: 8px;
+  }
+
+  .app-settings-toggle__label {
+    display: none;
+  }
+
+  .app-settings-panel {
+    width: calc(100vw - 20px);
+    max-height: calc(100dvh - 20px);
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .result-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .result-actions .btn {
+    width: 100%;
+    min-height: 48px;
+    margin: 0;
+  }
+}
+
+
 /* Reading-comfort changes are screen-only and must never alter printed output. */
 @media print {
   html {
@@ -1199,6 +1449,9 @@ body.reading-reduced-glare img:not(.crest) {
     color: var(--text-main) !important;
   }
 
+  .app-settings-toggle,
+  .app-settings-backdrop,
+  .app-settings-panel,
   .reading-comfort-toggle,
   .reading-comfort-remove,
   .reading-comfort-panel,
@@ -1292,5 +1545,60 @@ body.reading-reduced-glare img:not(.crest) {
 
   body.reading-reduced-glare img:not(.crest) {
     filter: none !important;
+  }
+}
+
+
+/* iPad, touch, safe-area and failure-state refinements */
+button,
+.btn,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+.app-settings-toggle {
+  left: max(18px, env(safe-area-inset-left));
+  bottom: max(18px, env(safe-area-inset-bottom));
+}
+
+.reading-comfort-toggle {
+  top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
+}
+
+.app-settings-panel {
+  max-height: calc(100vh - 28px);
+  max-height: calc(100dvh - 28px);
+  padding-bottom: max(22px, env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-action-button:disabled {
+  opacity: 0.62;
+  cursor: progress;
+}
+
+.fatal-error {
+  width: min(680px, calc(100% - 32px));
+  margin: 48px auto;
+  border: 1px solid #fecaca;
+  border-radius: 16px;
+  padding: 24px;
+  background: #fff7f7;
+  color: #7f1d1d;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media (max-width: 640px) {
+  .app-settings-toggle {
+    left: max(10px, env(safe-area-inset-left));
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .app-settings-panel {
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
   }
 }

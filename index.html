@@ -7,7 +7,7 @@
     <title id="page-title">Loading…</title>
     <!-- Add a favicon for better browser tab appearance -->
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="stylesheet" href="styles.css?v=12">
+    <link rel="stylesheet" href="styles.css?v=14">
 
   </head>
   <body>
@@ -66,20 +66,16 @@
     Load Assessment
   </button>
 
-  <button
-    class="btn btn-secondary"
-    type="button"
-   onclick="window.open('resource.html', '_blank')"
-  >
+  <a class="btn btn-secondary" href="resource.html" target="_blank" rel="noopener">
     Resources
-  </button>
+  </a>
 </div>
 
         <section class="form-section" id="form">
           <div id="questions"></div>
 
           <div class="btn-group">
-            <button class="btn" onclick="submitWork()">Submit &amp; Grade</button>
+            <button class="btn" type="button" onclick="submitWork()">Submit &amp; Grade</button>
           </div>
         </section>
       </section>
@@ -91,14 +87,57 @@
           <div class="grade" id="grade"></div>
         </div>
         <div id="answers"></div>
-        <div class="btn-group">
-          <button class="btn" id="emailBtn" onclick="emailWork()" disabled>
-            Email via Default App
+        <div class="btn-group result-actions" aria-label="Completed assessment actions">
+          <button class="btn" id="downloadBtn" type="button" onclick="downloadWork()" disabled>
+            Download PDF
           </button>
-          <button class="btn btn-secondary" onclick="back()">Back to Form</button>
+          <button class="btn btn-secondary" id="shareBtn" type="button" onclick="shareWork()" disabled>
+            Share PDF
+          </button>
+          <button class="btn btn-secondary" type="button" onclick="back()">Back to Form</button>
         </div>
+        <p id="pdfStatus" class="share-help" aria-live="polite"></p>
+        <p id="shareHelp" class="share-help">On iPad, use <strong>Share PDF</strong> for the share sheet. If Download PDF opens a preview, tap Share and then Save to Files.</p>
       </section>
     </div>
+
+
+    <!-- Touch-friendly assessment save/load controls. -->
+    <button id="appSettingsToggle" class="app-settings-toggle" type="button" aria-controls="appSettingsPanel" aria-expanded="false" aria-label="Open assessment settings">
+      <span class="app-settings-toggle__icon" aria-hidden="true">&#9881;</span>
+      <span class="app-settings-toggle__label">Save &amp; load</span>
+    </button>
+
+    <div id="appSettingsBackdrop" class="app-settings-backdrop hidden" aria-hidden="true"></div>
+
+    <aside id="appSettingsPanel" class="app-settings-panel hidden" aria-labelledby="appSettingsTitle" aria-hidden="true" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="app-settings-panel__header">
+        <div>
+          <p class="app-settings-kicker">Assessment tools</p>
+          <h2 id="appSettingsTitle">Save &amp; Load</h2>
+        </div>
+        <button id="appSettingsClose" class="app-settings-close" type="button" aria-label="Close assessment settings">&times;</button>
+      </div>
+
+      <p class="app-settings-intro">Answers save automatically in this browser. A backup file lets a student move their work to another device or restore it later.</p>
+
+      <div class="app-settings-status" id="appSettingsStatus" aria-live="polite">
+        Enter the Student ID before saving or loading a backup.
+      </div>
+
+      <div class="app-settings-actions">
+        <button id="settingsSaveProgress" class="settings-action-button" type="button">
+          <span aria-hidden="true">&#8681;</span>
+          <span><strong>Download backup</strong><small>Save an encrypted .puk progress file</small></span>
+        </button>
+        <button id="settingsLoadProgress" class="settings-action-button settings-action-button--secondary" type="button">
+          <span aria-hidden="true">&#8679;</span>
+          <span><strong>Load backup</strong><small>Choose a previously saved .puk file</small></span>
+        </button>
+      </div>
+
+      <p class="app-settings-note"><strong>Important:</strong> the Student ID entered here must match the ID used when the backup was created.</p>
+    </aside>
 
     <!-- Reading comfort controls. These are kept separate from assessment logic. -->
     <button id="readingComfortToggle" class="reading-comfort-toggle" type="button" aria-controls="readingComfortPanel" aria-expanded="false">
@@ -259,7 +298,8 @@
     </aside>
 
     <!-- Load the application logic. Using regular script tags avoids issues with ES module loading via file://. -->
-    <script src="script.js?v=12" defer></script>
+    <script src="questions-data.js?v=1" defer></script>
+    <script src="script.js?v=15" defer></script>
     <script src="reading-comfort.js?v=2" defer></script>
   </body>
 </html>
