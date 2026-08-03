@@ -712,7 +712,7 @@
     },
     {
       "points": 1,
-      "check": "structural.*stabl|structurally stable|stable if dry|stable when dry|dimensionally? stable|warp|warps|may warp|twist|cup|bow|movement|shrink|expand|swells?|moisture|gets? wet|when wet|if wet|seasoned|kiln[- ]?dried|less movement.*dry",
+      "check": "structural.*stabl|structurally stable|stable if dry|stable when dry|dimensionally? stable|warp|warps|may warp|twist|cup|bow|movement|shrink|expand|swells?|moisture|gets? wet|when wet|if wet|seasoned|kiln[- ]?dried|less movement.*dry|used for (building and )?construction|suitable for (lightweight )?construction",
       "flags": "i"
     }
   ]
@@ -1177,7 +1177,7 @@
     },
     {
       "points": 1,
-      "check": "structural.*stabl|structurally stable|stable bond|stable joint|stable joints|strong and stable|stronger and stable|strengthen.*joint|supports?.*joint|keeps?.*stable|prevents?.*movement|hard.*come apart|durable.*bond|secure.*joint",
+      "check": "structural.*stabl|structurally stable|stable bond|stable joint|stable joints|stable.*joint|strong and stable|stronger and stable|strengthen.*joint|supports?.*joint|keeps?.*stable|prevents?.*movement|hard.*come apart|durable.*bond|secure.*joint|long[- ]?lasting.*joint|stable and long[- ]?lasting",
       "flags": "i"
     }
   ]
