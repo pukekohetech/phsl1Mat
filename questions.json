@@ -163,6 +163,16 @@
               "check": "rimu",
               "flags": "i"
             },
+              {
+              "points": 1,
+              "check": "ash",
+              "flags": "i"
+            },
+              {
+              "points": 1,
+              "check": "maple",
+              "flags": "i"
+            },
             {
               "points": 1,
               "check": "kauri",
