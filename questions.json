@@ -1169,28 +1169,28 @@
           "hint": "Think about the PVA glue you used in class – colour when wet/dry, clean-up, clamping, strength, interior-only use, etc. (Not covered in this booklet.)",
           "type": "long",
           "maxPoints": 4,
-          "rubric": [
-    {
-      "points": 1,
-      "check": "white|creamy|milky|opaque|clear|transparent|translucent|turns? clear|dries? clear|dries? transparent|creamy[- ]?white|creamy clear",
-      "flags": "i"
-    },
-    {
-      "points": 1,
-      "check": "easy to (apply|use|work with|spread)|very easy to work with|workab|liquid|runny|viscous|thick|creamy consistency|water[- ]?based|water[- ]?soluble|spreads? easily|spreadable|brush|nozzle|finger|flows? well|clean ?up.*water|washes?.*water|wipe.*water|reposition|working time|clamp",
-      "flags": "i"
-    },
-    {
-      "points": 1,
-      "check": "strong glue|strong bond|stronger|strength|extra layer of strength|good strength|high strength|permanent bond|hard.*come apart|difficult.*come apart|holds?.*well|secure bond|durable bond",
-      "flags": "i"
-    },
-    {
-      "points": 1,
-      "check": "structural.*stabl|structurally stable|stable bond|stable joint|stable joints|stable.*joint|strong and stable|stronger and stable|strengthen.*joint|supports?.*joint|keeps?.*stable|prevents?.*movement|hard.*come apart|durable.*bond|secure.*joint|long[- ]?lasting.*joint|stable and long[- ]?lasting",
-      "flags": "i"
-    }
-  ]
+          [
+      {
+        "points": 1,
+        "check": "white|creamy|milky|opaque|clear|transparent|translucent|turns? clear|dries? clear|dries? transparent|creamy[- ]?white|creamy clear|white.*(wet|liquid)|dries?.*(clear|transparent|translucent)|becomes?.*(clear|transparent|translucent)|clear.*when.*dry",
+        "flags": "i"
+      },
+      {
+        "points": 1,
+        "check": "easy to (apply|use|work with|spread)|very easy to work with|workab|liquid|runny|viscous|thick|creamy consistency|water[- ]?based|water[- ]?soluble|spreads? easily|spreadable|brush|nozzle|finger|flows? well|clean ?up.*water|clean.*wet cloth|washes?.*water|wipe.*water|wipe.*wet cloth|wet cloth|damp cloth|reposition|working time|work time|open time|10 to 15 minute|clamp|clamped|clamping|sand.*off|easy.*clean",
+        "flags": "i"
+      },
+      {
+        "points": 1,
+        "check": "strong glue|strong bond|stronger|strength|extra layer of strength|good strength|high strength|very good.*strength|permanent bond|hard.*come apart|difficult.*come apart|holds?.*well|secure bond|durable bond|wood.*break.*before.*glue|wood.*fail.*before.*glue|stronger than.*wood|sinks? into.*(wood|pores)|soaks? into.*(wood|pores)|penetrates?.*(wood|pores)",
+        "flags": "i"
+      },
+      {
+        "points": 1,
+        "check": "structural.*stabl|structurally stable|stable bond|stable joint|stable joints|stable.*joint|strong and stable|stronger and stable|strengthen.*joint|supports?.*joint|keeps?.*stable|prevents?.*movement|hard.*come apart|durable.*bond|secure.*joint|long[- ]?lasting.*joint|stable and long[- ]?lasting|dimensionally stable|dimensional stability|does not shrink|doesn't shrink|does not expand|doesn't expand|does not crack|doesn't crack|not shrink|not expand|not crack|no shrinkage|no expansion|no cracking|resists?.*shrink|resists?.*expand|resists?.*crack|shrink.*expand.*crack|maintains?.*(shape|joint|bond)|keeps?.*(shape|joint|bond)",
+        "flags": "i"
+      }
+    ]
         },
         {
           "id": "mat3_q3",
@@ -1199,83 +1199,28 @@
           "hint": "Use your knowledge of other glues from class (polyurethane, epoxy, hot-melt, etc.) to compare with PVA.",
           "type": "long",
           "maxPoints": 4,
-          "rubric": [
-            {
-              "points": 1,
-              "check": "polyurethane|PU glue|gorilla glue|expanding foam|foams?.*up",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "epoxy|two.?part|resin|araldite|west system",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "contact adhesive|evostik|spray adhesive|thixotropic",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "aliphatic|yellow glue|titebond|carpenter.?s glue|cross.?link",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "hot glue|hot.?melt|glue gun",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "waterproof|water.?resistant|exterior|type I|type II|boil proof|marine|won't fail.*wet",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "not waterproof|interior only|fails?.*water|breaks?.*moisture|swells?.*wet",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "stronger|higher strength|ultimate bond|structural|gap.?filling|fills gaps?",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "weaker|lower strength|wood failure|stronger than wood|not structural",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "longer open time|shorter open time|quick set|fast grab|instant|slow cure",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "clean.*water|water clean|easy clean|washes?.*water|messy|hard to clean|solvent",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "cheaper|less expensive|lower cost|budget|inexpensive",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "more expensive|dearer|higher cost|premium|costs?.*more",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "clamp|no clamp|clamp.?free|needs clamping|clamping time",
-              "flags": "i"
-            },
-            {
-              "points": 1,
-              "check": "toxic|fumes|ventilation|harmful|non.?toxic|safe|food safe|school safe",
-              "flags": "i"
-            }
-          ]
+       "rubric": [
+      {
+        "points": 1,
+        "check": "polyurethane|PU glue|gorilla glue|expanding foam|foams?.*up|epoxy|two.?part|resin|araldite|west system|contact adhesive|evostik|spray adhesive|thixotropic|aliphatic|yellow glue|titebond|carpenter.?s glue|cross.?link|hot glue|hot.?melt|glue gun",
+        "flags": "i"
+      },
+      {
+        "points": 1,
+        "check": "waterproof|water.?resistant|exterior|outdoor|outside use|type I|type II|boil proof|marine|won't fail.*wet|will not fail.*wet|resists?.*(water|moisture)|suitable.*(wet|damp|outside|outdoor)|not waterproof|interior only|indoor.*only|inside.*only|fails?.*water|fail.*when.*wet|softens?.*wet|softens?.*water|breaks?.*moisture|swells?.*wet|not.*water.?resistant|unsuitable.*(wet|outside|outdoor)",
+        "flags": "i"
+      },
+      {
+        "points": 1,
+        "check": "stronger|higher strength|ultimate bond|structural|gap.?filling|fills gaps?|expands?|expanded|expanding|expands?.*(dries|drying|cures|curing)|foams?.*(dries|drying|cures|curing)|fills?.*(gap|space)|better.*bond|strong.*bond|weaker|lower strength|wood failure|wood.*break.*before.*glue|stronger than wood|not structural",
+        "flags": "i"
+      },
+      {
+        "points": 1,
+        "check": "longer open time|shorter open time|quick set|fast grab|instant|slow cure|faster.*(dry|set|cure)|slower.*(dry|set|cure)|takes?.*longer|takes?.*less time|takes?.*more time|drying time|dry time|setting time|curing time|cure time|fully dry|full cure|30 to 60 minutes|1 to 2 hours|24 hours|clean.*water|water clean|easy clean|washes?.*water|wipe.*water|wet cloth|damp cloth|messy|hard to clean|hard.*get off|difficult.*remove|solvent|acetone|mineral spirits|sand.*off|sanded|chipped|chip.*off|remove.*water|clean.*cloth|cheaper|less expensive|lower cost|budget|inexpensive|more expensive|dearer|higher cost|premium|costs?.*more|clamp|clamped|clamping|no clamp|clamp.?free|needs clamping|requires?.*clamp|clamping time|keep.*clamped|toxic|fumes|ventilation|harmful|non.?toxic|safe|food safe|school safe|colour|color|white.*(amber|clear|yellow|brown)|amber.*(white|clear)|clear.*(white|amber|yellow|brown)|yellow.*(white|clear)|brown.*(white|clear)|dries?.*(clear|transparent|yellow|brown)|transparent.*(yellow|brown|amber)|appearance|looks?.*different",
+        "flags": "i"
+      }
+    ]
         },
         {
           "id": "mat3_q4",
