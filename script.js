@@ -1,5 +1,5 @@
 // ============================================================
-// assessment.js - PHS US 24355 Materials Knowledge (single-file logic)
+// assessment.js — PHS Safety Knowledge (single-file logic)
 // Preserves all existing features from your LAST working version,
 // and ADDS:
 //   ✅ Ctrl+S  -> export encrypted progress file (.puk)
@@ -163,7 +163,7 @@ const DEBUG = false; // ← Debug logging off in production
 // ------------------------------------------------------------
 // Requirements
 // ------------------------------------------------------------
-const MIN_PCT_FOR_SUBMIT = 100; // Change to e.g. 80 if you want 80% or better
+const MIN_PCT_FOR_SUBMIT = 94; // Change to e.g. 80 if you want 80% or better
 
 function findMostRecentStorageKeyForApp(appId, currentKey) {
   try {
@@ -337,267 +337,6 @@ function getStudentEmail(studentId) {
   return `${id}@pukekohehigh.school.nz`;
 }
 
-function buildMaterialRecordFromResults(results = []) {
-  const answerFor = (id) => {
-    const wanted = String(id || "").toLowerCase();
-    const match = (results || []).find((result) => String(result?.id || "").toLowerCase() === wanted);
-    return (match?.answer || "").trim();
-  };
-
-  return {
-    projectName: answerFor("q_project"),
-    materials: [
-      {
-        name: "Radiata Pine Timber 90mm x 19mm",
-        purpose: answerFor("mat1_q1"),
-        properties: answerFor("mat1_q2"),
-        alternative: answerFor("mat1_q3"),
-        selected: answerFor("mat1_q4"),
-      },
-      {
-        name: "Plywood Sheets 4mm",
-        purpose: answerFor("mat2_q1"),
-        properties: answerFor("mat2_q2"),
-        alternative: answerFor("mat2_q3"),
-        selected: answerFor("mat2_q4"),
-      },
-      {
-        name: "PVA Wood Glue",
-        purpose: answerFor("mat3_q1"),
-        properties: answerFor("mat3_q2"),
-        alternative: answerFor("mat3_q3"),
-        selected: answerFor("mat3_q4"),
-      },
-      {
-        name: "19mm x 1.6mm Jolt Head Nails",
-        purpose: answerFor("mat4_q1"),
-        properties: answerFor("mat4_q2"),
-        alternative: answerFor("mat4_q3"),
-        selected: answerFor("mat4_q4"),
-      },
-    ],
-  };
-}
-
-function normalisePdfText(value) {
-  // pdf-lib's built-in Helvetica font is WinAnsi. Normalising here prevents
-  // a single unsupported character from breaking the whole PDF export.
-  return String(value ?? "")
-    .replace(/[\u2013\u2014]/g, "-")
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/[\u201C\u201D]/g, '"')
-    .replace(/\u2026/g, "...")
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\x20-\x7E\xA0-\xFF]/g, "?")
-    .trim();
-}
-
-function wrapPdfText(text, font, size, maxWidth) {
-  const value = normalisePdfText(text);
-  if (!value) return [];
-
-  const lines = [];
-  const paragraphs = value.split(/\r?\n/);
-
-  const splitLongWord = (word) => {
-    const pieces = [];
-    let piece = "";
-    for (const char of word) {
-      const test = piece + char;
-      if (piece && font.widthOfTextAtSize(test, size) > maxWidth) {
-        pieces.push(piece);
-        piece = char;
-      } else {
-        piece = test;
-      }
-    }
-    if (piece) pieces.push(piece);
-    return pieces;
-  };
-
-  paragraphs.forEach((paragraph, paragraphIndex) => {
-    const words = paragraph.trim().split(/\s+/).filter(Boolean);
-    let line = "";
-
-    words.forEach((word) => {
-      const chunks = font.widthOfTextAtSize(word, size) <= maxWidth ? [word] : splitLongWord(word);
-      chunks.forEach((chunk) => {
-        const test = line ? `${line} ${chunk}` : chunk;
-        if (!line || font.widthOfTextAtSize(test, size) <= maxWidth) {
-          line = test;
-        } else {
-          lines.push(line);
-          line = chunk;
-        }
-      });
-    });
-
-    if (line) lines.push(line);
-    if (paragraphIndex < paragraphs.length - 1) lines.push("");
-  });
-
-  return lines;
-}
-
-function drawTextInPdfBox(page, text, box, font, options = {}) {
-  const padding = options.padding ?? 4;
-  const maxSize = options.maxSize ?? 8;
-  const minSize = options.minSize ?? 6;
-  const lineFactor = options.lineFactor ?? 1.18;
-  const width = Math.max(1, box.width - padding * 2);
-  const height = Math.max(1, box.height - padding * 2);
-  let size = maxSize;
-  let lines = [];
-  let lineHeight = size * lineFactor;
-
-  while (size >= minSize) {
-    lines = wrapPdfText(text, font, size, width);
-    lineHeight = size * lineFactor;
-    if (lines.length * lineHeight <= height) break;
-    size -= 0.25;
-  }
-
-  if (!lines.length) return;
-
-  const maxLines = Math.max(1, Math.floor(height / lineHeight));
-  if (lines.length > maxLines) {
-    lines = lines.slice(0, maxLines);
-    let last = lines[maxLines - 1];
-    while (last && font.widthOfTextAtSize(`${last}...`, size) > width) {
-      last = last.slice(0, -1).trimEnd();
-    }
-    lines[maxLines - 1] = `${last || ""}...`;
-  }
-
-  let y = box.y + box.height - padding - size;
-  for (const line of lines) {
-    page.drawText(line, {
-      x: box.x + padding,
-      y,
-      size,
-      font,
-    });
-    y -= lineHeight;
-  }
-}
-
-function drawSingleLinePdfText(page, text, box, font, options = {}) {
-  const value = normalisePdfText(text);
-  if (!value) return;
-
-  const padding = options.padding ?? 2;
-  const maxSize = options.maxSize ?? 10;
-  const minSize = options.minSize ?? 7;
-  const width = Math.max(1, box.width - padding * 2);
-  let size = maxSize;
-
-  while (size > minSize && font.widthOfTextAtSize(value, size) > width) size -= 0.25;
-
-  page.drawText(value, {
-    x: box.x + padding,
-    y: box.y + Math.max(0, (box.height - size) / 2),
-    size,
-    font,
-  });
-}
-
-async function stampMaterialRecordPdf(doc, finalData) {
-  const { StandardFonts } = window.PDFLib;
-  if (doc.getPageCount() < 2) return false;
-
-  const font = await doc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
-  const pages = doc.getPages();
-  const page1 = pages[0];
-  const page2 = pages[1];
-  const record = finalData.materialRecord || {};
-  const materials = Array.isArray(record.materials) ? record.materials : [];
-
-  const studentEmail = getStudentEmail(finalData.studentId);
-  const studentCombined = `${finalData.studentName} ${studentEmail}`.trim();
-
-  // Page 1 identity fields.
-  drawSingleLinePdfText(page1, studentCombined, {
-    x: 135,
-    y: 440.2,
-    width: 568,
-    height: 23.4,
-  }, font, { maxSize: 9.5, minSize: 7 });
-
-  drawSingleLinePdfText(page1, record.projectName || "", {
-    x: 140,
-    y: 417.1,
-    width: 563,
-    height: 22.9,
-  }, font, { maxSize: 9.5, minSize: 7 });
-
-  // The four table columns are equal-width cells in the supplied two-page
-  // BCATS Materials record sheet.
-  const columns = [
-    { key: "purpose", x: 66.72, width: 161.28 },
-    { key: "properties", x: 228.00, width: 160.80 },
-    { key: "alternative", x: 388.80, width: 161.28 },
-    { key: "selected", x: 550.08, width: 160.80 },
-  ];
-
-  const rows = [
-    { page: page1, y: 239.52, height: 94.56, labelY: 334.08, labelHeight: 20.16, labelX: 154 },
-    { page: page1, y: 112.80, height: 105.60, labelY: 218.40, labelHeight: 21.12, labelX: 116 },
-    { page: page2, y: 346.56, height: 87.84, labelY: 434.40, labelHeight: 21.12, labelX: 116 },
-    { page: page2, y: 239.52, height: 85.92, labelY: 325.44, labelHeight: 21.12, labelX: 116 },
-  ];
-
-  rows.forEach((row, index) => {
-    const material = materials[index] || {};
-
-    // The template already prints "Material 1: Timber" / "Material 2:" etc.
-    // Add the exact classroom material beside that heading.
-    const headingText = index === 0
-      ? "Radiata Pine 90mm x 19mm"
-      : (material.name || "");
-    drawSingleLinePdfText(row.page, headingText, {
-      x: row.labelX,
-      y: row.labelY,
-      width: 710.88 - row.labelX - 5,
-      height: row.labelHeight,
-    }, boldFont, { maxSize: 8.2, minSize: 6.5, padding: 1 });
-
-    columns.forEach((column) => {
-      const maxSize = column.key === "purpose" ? 6.6 : column.key === "selected" ? 5.8 : 6.0;
-      drawTextInPdfBox(row.page, material[column.key] || "", {
-        x: column.x,
-        y: row.y,
-        width: column.width,
-        height: row.height,
-      }, font, {
-        maxSize,
-        minSize: 4.5,
-        padding: 3.5,
-        lineFactor: 1.12,
-      });
-    });
-  });
-
-  // Keep the assessor-only criteria and signature as genuine teacher sign-off.
-  // As with the Safety version, we pre-fill assessor name and submission date.
-  drawSingleLinePdfText(page2, finalData.teacherName, {
-    x: 128,
-    y: 132,
-    width: 360,
-    height: 18,
-  }, font, { maxSize: 9, minSize: 7 });
-
-  drawSingleLinePdfText(page2, new Date().toLocaleDateString("en-NZ"), {
-    x: 548,
-    y: 110,
-    width: 72,
-    height: 18,
-  }, font, { maxSize: 8.5, minSize: 7 });
-
-  return true;
-}
-
 async function fillPdfForm(pdfBytes, finalData) {
   if (!window.PDFLib) {
     await loadFirstAvailableScript(PDF_LIBRARY_URLS.pdfLib);
@@ -605,49 +344,45 @@ async function fillPdfForm(pdfBytes, finalData) {
   if (!window.PDFLib) throw new Error("pdf-lib failed to load");
 
   const { PDFDocument } = window.PDFLib;
+
   const doc = await PDFDocument.load(pdfBytes);
+  const form = doc.getForm();
 
-  let form = null;
-  let fields = [];
-  try {
-    form = doc.getForm();
-    fields = form.getFields();
-  } catch (error) {
-    if (DEBUG) console.warn("PDF has no usable AcroForm fields:", error);
-  }
-
-  // Backward compatibility with the original one-page fillable sign-off PDF.
-  if (form && fields.length) {
-    const safeSetMany = (nameLike, value) => {
-      try {
-        fields.forEach((field) => {
-          try {
-            const name = field.getName();
-            if (name.toLowerCase().includes(nameLike.toLowerCase()) && typeof field.setText === "function") {
-              field.setText(value || "");
+  const safeSetMany = (nameLike, value) => {
+    try {
+      form.getFields().forEach((f) => {
+        try {
+          const n = f.getName();
+          if (n.toLowerCase().includes(nameLike.toLowerCase())) {
+            if (typeof f.setText === "function") {
+              f.setText(value || "");
             }
-          } catch {}
-        });
-      } catch (error) {
-        console.warn(`safeSetMany failed for: ${nameLike}`, error);
-      }
-    };
+          }
+        } catch {}
+      });
+    } catch (e) {
+      console.warn(`safeSetMany failed for: ${nameLike}`, e);
+    }
+  };
 
-    const studentEmail = getStudentEmail(finalData.studentId);
-    const studentCombined = `${finalData.studentName} ${studentEmail}`.trim();
-    safeSetMany("StudentName", studentCombined);
-    safeSetMany("AssessorName", finalData.teacherName);
-    safeSetMany("Date", new Date().toLocaleDateString("en-NZ"));
+  // (kept for compatibility / logs)
+  const safeSet = (fieldName, value) => {
+    try {
+      form.getTextField(fieldName).setText(value || "");
+    } catch (e) {
+      console.warn(`Field not found: ${fieldName}`);
+    }
+  };
 
-    form.flatten();
-  }
+  const studentEmail = getStudentEmail(finalData.studentId);
+  const studentCombined = `${finalData.studentName} ${studentEmail}`.trim();
 
-  // The replacement two-page Materials sheet is non-fillable. Stamp the
-  // project and all four materials directly into the correct table cells.
-  if (finalData.materialRecord?.materials?.length) {
-    await stampMaterialRecordPdf(doc, finalData);
-  }
+  safeSetMany("StudentName", studentCombined);
+  safeSetMany("AssessorName", finalData.teacherName);
+  safeSetMany("Date", new Date().toLocaleDateString("en-NZ"));
+  safeSetMany("Result", finalData.pct >= 100 ? "A" : "N");
 
+  form.flatten();
   return await doc.save();
 }
 
@@ -1708,7 +1443,6 @@ function submitWork() {
     totalPoints,
     pct,
     deadlineInfo: deadlineNow,
-    materialRecord: buildMaterialRecordFromResults(results),
   };
 
   const canExport = pct >= MIN_PCT_FOR_SUBMIT && (!deadlineNow || deadlineNow.status !== "overdue");
